@@ -106,7 +106,9 @@ To add more, just append to the arrays — no engine changes needed.
 - `consume:"Smoke bombs"` — spends one of that item when the option resolves.
 Statuses begin with signature gear via `startItems:[…]` in `core.js`, so *who you are* changes *what you can do*.
 
-**The wheel shows the true odds.** Wedge sizes are drawn **proportional to each option's real weight** (stat + companions + luck + carried items), so a fat slice genuinely is more likely. Labels always render upright, whatever the wheel's resting angle.
+**The wheel shows the true odds.** Wedge sizes are drawn **proportional to each option's real weight** (stat + companions + luck + carried items), so a fat slice genuinely is more likely. The slices are **ordered smallest‑chance to largest** clockwise from the pointer, so you can read the odds at a glance, and labels always render upright whatever the wheel's resting angle.
+
+**Illustrated gear, tap for detail.** Every item and companion has its own bundled SVG picture (original CC0 art in `js/data/art.js` — no external images, so it works offline and on Pages with zero network). Tap any item or companion tile in the sidebar to open a card with its description and its concrete **benefit** (what it does mechanically, or the stat/luck bonus a companion brings). Item text and effects live in `js/data/items.js` (`DATA.itemInfo`), keyed by name with sensible category fallbacks so anything picked up on the road still gets a proper card.
 
 **Destiny can turn.** Some encounters (and a few campfire dreams) carry a `quest:"revenge"`‑style key that **rewrites your purpose** mid‑journey — a glimpsed old enemy, a lord's war‑fan, a false arrest, a shrine's summons. Gates like `requiresQuest`, `requiresItem`, `requiresStatus`, `forbidFlag`, `once` and `minStep` let these land as turning‑points and chain into follow‑ons (e.g. *A Face from the Ash* → *The Reckoning*), each routing to its own ending. And an encounter never repeats **twice in a row** — a rest has to fall between.
 
