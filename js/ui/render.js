@@ -3,31 +3,10 @@
  * ========================================================================== */
 window.UI = (function () {
   const $ = id => document.getElementById(id);
-  let muted = false;
 
-  /* ---- tiny WebAudio blips (no asset files) ---------------------------- */
-  let actx = null;
-  function beep(freq, dur, type) {
-    if (muted) return;
-    try {
-      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-      const o = actx.createOscillator(), g = actx.createGain();
-      o.type = type || "triangle"; o.frequency.value = freq;
-      g.gain.value = 0.05; o.connect(g); g.connect(actx.destination);
-      o.start();
-      g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + dur);
-      o.stop(actx.currentTime + dur);
-    } catch (e) {}
-  }
-  const sfx = {
-    click: () => beep(420, 0.06, "square"),
-    spin: () => beep(300, 0.5, "sawtooth"),
-    good: () => { beep(523, 0.12); setTimeout(() => beep(784, 0.18), 90); },
-    bad: () => beep(150, 0.35, "sawtooth"),
-    heal: () => beep(660, 0.15),
-    end: () => { beep(392, 0.2); setTimeout(() => beep(523, 0.3), 160); },
-  };
-  function toggleMute() { muted = !muted; $("btn-mute").textContent = muted ? "♪ Sound: off" : "♪ Sound: on"; return muted; }
+  /* sound has been removed entirely — these are silent no-ops so the rest of
+   * the code can keep calling UI.sfx.* without change. */
+  const sfx = { click(){}, spin(){}, good(){}, bad(){}, heal(){}, end(){} };
 
   /* ---- prompt + action button ----------------------------------------- */
   function setTitle(t) { $("prompt-title").textContent = t; }
@@ -124,6 +103,7 @@ window.UI = (function () {
       }
       ig.appendChild(slot);
     }
+    if (window.SCENE) SCENE.sync(S);
   }
 
   /* ---- detail popups for a tapped item / companion -------------------- */
@@ -183,6 +163,6 @@ window.UI = (function () {
 
   return {
     setTitle, setSub, setAction, hideAction, showAction,
-    log, logNotes, rebuildJournal, renderSheet, modal, sfx, toggleMute, questLabel,
+    log, logNotes, rebuildJournal, renderSheet, modal, sfx, questLabel,
   };
 })();
