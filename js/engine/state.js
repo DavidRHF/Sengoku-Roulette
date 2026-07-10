@@ -24,6 +24,7 @@ window.STATE = (function () {
       log: [],
       ended: null,
       pendingLoc: null,
+      lastEnc: null,     // id of the previous encounter (no repeats back-to-back)
     };
     return S;
   }
@@ -38,6 +39,7 @@ window.STATE = (function () {
     S.hp = st.hp; S.maxhp = st.hp;
     S.str = st.str; S.wis = st.wis; S.cha = st.cha;
     S.luck = st.luck || 0;
+    if (st.startItems) for (const it of st.startItems) S.inventory.push(it);
     if (st.startComp) addCompanion(st.startComp, true);
   }
 
@@ -86,6 +88,13 @@ window.STATE = (function () {
     return DATA.companions[id] ? DATA.companions[id].name : null;
   }
 
+  function hasItem(name) { return S.inventory.includes(name); }
+  function consumeItem(name) {
+    const i = S.inventory.indexOf(name);
+    if (i >= 0) { S.inventory.splice(i, 1); return name; }
+    return null;
+  }
+
   /* ---- Apply a scene/option effect object ------------------------------ */
   function applyEffects(eff) {
     const notes = [];
@@ -96,10 +105,15 @@ window.STATE = (function () {
       S.hp = clamp(S.hp + eff.maxhp, 0, S.maxhp);
       notes.push({ t: "maxhp", v: eff.maxhp }); }
     if (eff.item) { S.inventory.push(eff.item); notes.push({ t: "item", v: eff.item }); }
+    if (eff.consume) { const n = consumeItem(eff.consume); if (n) notes.push({ t: "consume", v: n }); }
     if (eff.comp) { const n = addCompanion(eff.comp); if (n) notes.push({ t: "comp", v: n }); }
     if (eff.rmComp) { const n = removeCompanion(); if (n) notes.push({ t: "rmcomp", v: n }); }
     if (eff.flag) S.flags[eff.flag] = true;
     if (eff.rmFlag) delete S.flags[eff.rmFlag];
+    if (eff.quest && eff.quest !== S.quest) {
+      const old = S.quest; S.quest = eff.quest;
+      notes.push({ t: "quest", v: eff.quest, old });
+    }
     if (eff.loc) S.pendingLoc = eff.loc;
     if (eff.ending) S.forceEnding = eff.ending;
     return notes;
@@ -121,10 +135,22 @@ window.STATE = (function () {
     if (entry.minStep && S.steps < entry.minStep) return false;
     if (entry.once && S.usedOnce[entry.id]) return false;
     if (entry.requiresFlag && !S.flags[entry.requiresFlag]) return false;
+    if (entry.forbidFlag && S.flags[entry.forbidFlag]) return false;
+    if (entry.requiresItem && !S.inventory.includes(entry.requiresItem)) return false;
+    if (entry.requiresQuest) {
+      const q = [].concat(entry.requiresQuest);
+      if (!q.includes(S.quest)) return false;
+    }
+    if (entry.requiresStatus) {
+      const r = [].concat(entry.requiresStatus);
+      if (!S.status || !r.includes(S.status.id)) return false;
+    }
     return true;
   }
-  function eligibleEncounters() {
-    const list = DATA.encounters.filter(eligible);
+  function eligibleEncounters(excludeId) {
+    let list = DATA.encounters.filter(eligible);
+    // no encounter twice in a row (unless a rest broke the streak)
+    if (excludeId) { const f = list.filter(e => e.id !== excludeId); if (f.length) list = f; }
     return list.length ? list : DATA.encounters.filter(e => (e.circles || ["any"]).includes("any"));
   }
   function eligibleRests() {
@@ -158,6 +184,7 @@ window.STATE = (function () {
       str: S.str, wis: S.wis, cha: S.cha,
       has: f => !!S.flags[f],
       hasComp: id => S.companions.includes(id),
+      hasItem: n => S.inventory.includes(n),
       compCount: S.companions.length,
       itemCount: S.inventory.length,
       loot,
@@ -188,6 +215,7 @@ window.STATE = (function () {
         circles: S.circles, loc: S.loc, flags: S.flags,
         inventory: S.inventory, companions: S.companions,
         steps: S.steps, sinceRest: S.sinceRest, usedOnce: S.usedOnce, log: S.log,
+        lastEnc: S.lastEnc,
       };
       localStorage.setItem("sengoku_save", JSON.stringify(data));
       return true;
@@ -211,7 +239,7 @@ window.STATE = (function () {
         circles: d.circles || [], loc: d.loc || "outskirts", flags: d.flags || {},
         inventory: d.inventory || [], companions: d.companions || [],
         steps: d.steps || 0, sinceRest: d.sinceRest || 0, usedOnce: d.usedOnce || {},
-        log: d.log || [],
+        log: d.log || [], lastEnc: d.lastEnc || null,
       });
       return true;
     } catch (e) { return false; }
@@ -219,7 +247,7 @@ window.STATE = (function () {
 
   return {
     fresh, get, applyStatus, applyTool, applyEffects,
-    effStat, totalLuck, compMod, addCompanion,
+    effStat, totalLuck, compMod, addCompanion, hasItem, consumeItem,
     eligibleEncounters, eligibleRests, eligibleIntros,
     checkEndings, save, load, hasSave,
   };

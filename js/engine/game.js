@@ -20,15 +20,26 @@ window.GAME = (function () {
     UI.showAction();
     UI.setAction(label, fn);
   }
-  function statHint(stat, eff) {
-    if (!stat) return "";
+  function oddsHint(stat, eff, opts) {
     const S = STATE.get();
-    const base = S[stat], bonus = STATE.compMod(stat);
-    const name = { str: "Strength", wis: "Wisdom", cha: "Charisma" }[stat];
-    let s = `${name} check — your ${stat.toUpperCase()} ${base}`;
-    if (bonus) s += ` (${bonus > 0 ? "+" : ""}${bonus} from companions)`;
+    let s = "";
+    if (stat) {
+      const base = S[stat], bonus = STATE.compMod(stat);
+      const name = { str: "Strength", wis: "Wisdom", cha: "Charisma" }[stat];
+      s = `${name} check — your ${stat.toUpperCase()} ${base}`;
+      if (bonus) s += ` (${bonus > 0 ? "+" : ""}${bonus} allies)`;
+      const tot = eff == null ? base : eff;
+      s += tot >= 15 ? " · the odds favor you" : tot <= 6 ? " · the odds are against you" : " · an even test";
+    } else {
+      s = "A turn of fortune";
+    }
     const luck = STATE.totalLuck();
-    if (luck) s += ` · fortune ${luck > 0 ? "favors" : "frowns on"} you`;
+    if (luck) s += ` · fortune ${luck > 0 ? "smiles" : "frowns"}`;
+    // surface item influence so the player understands the wheel
+    const boosted = opts && opts.find(o => o.boostItem && STATE.hasItem(o.boostItem));
+    if (boosted) s += ` · your ${boosted.boostItem} widens “${boosted.label}”`;
+    const unlocked = opts && opts.find(o => o.needItem && STATE.hasItem(o.needItem));
+    if (unlocked) s += ` · your ${unlocked.needItem} opens “${unlocked.label}”`;
     return s;
   }
 
@@ -45,11 +56,14 @@ window.GAME = (function () {
   function beginStatusSpin() {
     STATE.get().phase = "status";
     const { segments, winnerIndex } = RNG.creationSpin(DATA.statuses, 8);
+    segments.forEach(s => { s.weight = s.item.rarity; });
     UI.setTitle("What is your station in life?");
-    UI.setSub("The lowly are common; the mighty, rare.");
+    UI.setSub("The lowly are common; the mighty, rare — see how the slices differ.");
     pendingSpin(segments, winnerIndex, (st) => {
       STATE.applyStatus(st);
       UI.log(`Your station: ${st.name}. ${st.blurb}`, tierKind(st.tier));
+      const S = STATE.get();
+      if (S.inventory.length) UI.log(`You carry: ${S.inventory.join(", ")}.`, "gain");
       UI.renderSheet();
       pendingContinue("Take up your tools ▸", beginToolSpin);
     });
@@ -58,6 +72,7 @@ window.GAME = (function () {
   function beginToolSpin() {
     STATE.get().phase = "tool";
     const { segments, winnerIndex } = RNG.creationSpin(DATA.tools, 8);
+    segments.forEach(s => { s.weight = s.item.rarity; });
     UI.setTitle("What do you carry?");
     UI.setSub("A weapon, a tool, or nothing at all.");
     pendingSpin(segments, winnerIndex, (tl) => {
@@ -94,14 +109,18 @@ window.GAME = (function () {
     if (S.ended) return;
     UI.renderSheet();
     const isRest = S.sinceRest >= 2;
-    const pool = isRest ? STATE.eligibleRests() : STATE.eligibleEncounters();
+    // an encounter can't repeat back-to-back (a rest resets the streak)
+    const pool = isRest ? STATE.eligibleRests() : STATE.eligibleEncounters(S.lastEnc);
     const cands = RNG.sample(pool, 6);
     const winner = RNG.weightedPick(cands);
     const widx = cands.indexOf(winner);
-    const segs = cands.map(c => ({ label: c.title, item: c }));
+    const segs = cands.map(c => ({ label: c.title, item: c, weight: c.weight || 5 }));
     UI.setTitle(isRest ? "Night falls. Where do you rest?" : "The road unwinds ahead…");
     UI.setSub(DATA.locations[S.loc].name + " — " + DATA.locations[S.loc].blurb);
-    pendingSpin(segs, widx, (enc) => runScene(enc, enc.scene, isRest));
+    pendingSpin(segs, widx, (enc) => {
+      S.lastEnc = isRest ? null : enc.id;   // remember for the no-repeat rule
+      runScene(enc, enc.scene, isRest);
+    });
   }
 
   function runScene(enc, scene, isRest) {
@@ -116,10 +135,21 @@ window.GAME = (function () {
       const stat = scene.spin.stat;
       const eff = STATE.effStat(stat);
       const luck = STATE.totalLuck();
-      const widx = RNG.resolveOptions(scene.spin.options, stat, eff == null ? 0 : eff, luck);
-      const segs = scene.spin.options.map(o => ({ label: o.label, item: o, valence: o.valence }));
+      // options requiring an item you don't hold are hidden from the wheel
+      let opts = scene.spin.options.filter(o => !(o.needItem && !STATE.hasItem(o.needItem)));
+      if (opts.length < 1) opts = scene.spin.options;
+      // carried items sway the odds of specific options
+      const bias = opts.map(o => {
+        let m = 1;
+        if (o.boostItem && STATE.hasItem(o.boostItem)) m *= (o.boostAmt || 2.6);
+        if (o.dampItem && STATE.hasItem(o.dampItem)) m *= (o.dampAmt || 0.4);
+        return m;
+      });
+      const weights = RNG.optionWeights(opts, stat, eff == null ? 0 : eff, luck, bias);
+      const widx = RNG.weightedIndex(weights);
+      const segs = opts.map((o, i) => ({ label: o.label, item: o, valence: o.valence, weight: weights[i] }));
       UI.setTitle(scene.spin.prompt || enc.title);
-      UI.setSub(statHint(stat, eff));
+      UI.setSub(oddsHint(stat, eff, opts));
       pendingSpin(segs, widx, (opt) => {
         UI.log(opt.text, opt.valence === "good" ? "good" : opt.valence === "bad" ? "bad" : "story");
         const notes = STATE.applyEffects(opt);

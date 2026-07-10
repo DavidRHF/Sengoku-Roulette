@@ -57,23 +57,26 @@ window.RNG = (function () {
      Given a scene's options and the check stat, tilt each option's weight by
      the player's effective stat (base + companion mods), then nudge by luck.
      Good outcomes get likelier with a high stat; bad ones with a low stat.   */
-  function resolveOptions(options, stat, effStat, luck) {
-    const weights = options.map(o => {
+  /* Compute the real per-option weights (also used to size the wheel wedges,
+   * so what the player SEES matches the true odds). A high matching stat fattens
+   * the 'good' options and starves the 'bad' ones; luck and carried items shift
+   * them further. */
+  function optionWeights(options, stat, effStat, luck, itemBias) {
+    const s = stat ? clamp((effStat - 10) / 10, -1.4, 1.9) : 0; // skill vs. average
+    const L = clamp(luck, -8, 12);
+    return options.map((o, idx) => {
       let w = o.weight || 5;
-      if (stat && o.valence && o.valence !== "neutral") {
-        // effStat 0..~30. 20 is "mastery". Scale 0.45 .. ~2.4
-        const good = 0.45 + effStat / 13;
-        const bad = 0.45 + (20 - effStat) / 13;
-        if (o.valence === "good") w *= Math.max(0.2, good);
-        if (o.valence === "bad") w *= Math.max(0.2, bad);
-      }
-      // luck (−~6..+~10) shifts the whole moral weather a little
-      if (o.valence === "good") w *= (1 + clamp(luck, -8, 12) * 0.05);
-      if (o.valence === "bad") w *= (1 - clamp(luck, -8, 12) * 0.05);
-      return Math.max(0.05, w);
+      if (stat && o.valence === "good") w *= clamp(1 + 0.85 * s + L * 0.045, 0.12, 3.4);
+      if (stat && o.valence === "bad")  w *= clamp(1 - 0.85 * s - L * 0.045, 0.12, 3.4);
+      if (o.valence === "good" && !stat) w *= (1 + L * 0.04);
+      if (o.valence === "bad"  && !stat) w *= (1 - L * 0.04);
+      if (itemBias && itemBias[idx] != null) w *= itemBias[idx];
+      return Math.max(0.02, w);
     });
-    return weightedIndex(weights);
+  }
+  function resolveOptions(options, stat, effStat, luck, itemBias) {
+    return weightedIndex(optionWeights(options, stat, effStat, luck, itemBias));
   }
 
-  return { weightedIndex, weightedPick, sample, creationSpin, resolveOptions, clamp };
+  return { weightedIndex, weightedPick, sample, creationSpin, resolveOptions, optionWeights, clamp };
 })();
