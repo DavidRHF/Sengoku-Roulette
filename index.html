@@ -35,10 +35,8 @@
       <button id="btn-how" class="ctl ctl-gold">❔ How to Play</button>
       <button id="btn-save" class="ctl">▣ Save</button>
       <button id="btn-load" class="ctl">▤ Load</button>
-      <button id="btn-mute" class="ctl">♪ Sound: on</button>
-      <div class="left-note">
-        Two encounters, then rest. Where you stand shapes what you meet.
-        Your journey autosaves.
+      <div class="scene-frame">
+        <svg id="scene-svg" viewBox="0 0 220 176" aria-label="a scene of your journey, in the old style"></svg>
       </div>
     </aside>
 
@@ -122,6 +120,7 @@
   <script src="js/engine/state.js"></script>
   <!-- ui -->
   <script src="js/ui/wheel.js"></script>
+  <script src="js/ui/scene.js"></script>
   <script src="js/ui/render.js"></script>
   <!-- controller + boot -->
   <script src="js/engine/game.js"></script>
