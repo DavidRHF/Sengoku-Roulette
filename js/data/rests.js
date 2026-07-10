@@ -112,4 +112,32 @@ DATA.rests = [
     scene:{ text:"No shelter tonight but the stars and your cloak. You sleep light, wake stiff, and go on.", hp:3 } },
   { id:"restless", title:"A Sleepless Night", loc:["any"], circles:["any"], weight:5,
     scene:{ text:"Sleep will not come. You lie listening to the dark, turning your worries like stones, and rise gritty-eyed but moving.", hp:1 } },
+
+  /* ---------------- DREAMS THAT TURN THE ROAD (destiny) ------------- */
+  { id:"prophetic_dream", title:"A Dream of the Far Road", loc:["any"], circles:["any"], weight:4, once:true, minStep:4,
+    scene:{ text:"In sleep a white stag leads you down a road you have never walked, to a gate of light, and will not let you look away. You wake certain it meant something.",
+      spin:{ prompt:"What do you make of the dream?", stat:"wis",
+        options:[
+          { label:"Take it as a summons", weight:9, valence:"good", quest:"pilgrimage", text:"You cannot un-see it. At dawn you turn your steps toward the far shrine of the dream.", flag:"blessed_omen", hp:4 },
+          { label:"Seek its deeper meaning", weight:7, valence:"good", quest:"enlighten", text:"A dream like a door. You resolve to walk until you understand what stood on the other side.", flag:"centered", hp:3 },
+          { label:"Dismiss it as fatigue", weight:7, valence:"neutral", text:"You are tired, that is all. You rise and shake the stag from your head — mostly.", hp:5 },
+        ] } } },
+
+  { id:"campfire_confession", title:"A Confession by the Fire", loc:["road","wild","rural","farm"], circles:["any"], weight:4, once:true, minStep:5,
+    scene:{ text:"A fellow traveler shares your fire and, deep in the night, weeps out a name — the same warlord whose men once shattered your own life. He asks if you will help him see justice done.",
+      spin:{ prompt:"How do you answer him?", stat:"cha",
+        options:[
+          { label:"Make his cause yours", weight:9, valence:"good", quest:"revenge", text:"Two griefs braid into one purpose. You clasp his hand across the coals and swear it together.", flag:"vendetta", comp:"ronin_frnd" },
+          { label:"Counsel him toward peace", weight:7, valence:"good", quest:"pilgrimage", text:"You talk him down from the blade, and in doing so talk yourself toward a gentler road than vengeance.", flag:"centered", hp:3 },
+          { label:"Offer only silence", weight:7, valence:"neutral", text:"You have no words for his grief, only shared warmth against the dark. By morning he has gone.", hp:5 },
+        ] } } },
+
+  { id:"temple_lodging_pledge", title:"The Abbot's Offer", loc:["sacred"], circles:["any"], weight:5, minStep:3,
+    scene:{ text:"The temple grants you a cell for the night. Before dawn prayers the old abbot studies you and says, plainly, that the war needs more than swords. He offers you a purpose, if you will take it.",
+      spin:{ prompt:"Consider the abbot's charge.", stat:"wis",
+        options:[
+          { label:"Accept a sacred errand", weight:9, valence:"good", boostItem:"Sutra scroll", boostAmt:2.0, quest:"pilgrimage", text:"You take his blessing and his charge: carry word and mercy along the burning roads. The walk itself is now the work.", flag:"temple_ally", hp:6 },
+          { label:"Rest, and only rest", weight:9, valence:"neutral", text:"You bow, but keep your own road. The cell is warm; the rice, plain and good.", hp:8 },
+          { label:"Trouble the quiet", weight:5, valence:"bad", text:"You cannot still your restlessness, and disturb the dawn prayers. The monks feed you and firmly see you out.", hp:3, flag:"impure" },
+        ] } } },
 ];

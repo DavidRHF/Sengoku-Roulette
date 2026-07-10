@@ -44,9 +44,11 @@ DATA.encounters = [
     scene:{ text:"A sekisho barrier-gate. Guards demand your travel-papers and your business. The book of wanted faces lies open on their table.",
       spin:{ prompt:"How do you pass inspection?", stat:"cha",
         options:[
-          { label:"Present papers", weight:10, valence:"good", text:"Your bearing and story satisfy them. They wave you through with a bow.", hp:0 },
-          { label:"Talk your way through", weight:8, valence:"good", text:"A joke, a small gift, a flattered captain. The gate opens.", hp:0, item:"Traveler's pass" },
-          { label:"Bluster", weight:7, valence:"bad", text:"They dislike your tone and search your things roughly, confiscating a valuable.", hp:-2 },
+          { label:"Present sealed papers", weight:16, valence:"good", needItem:"Travel papers", text:"You lay your sealed travel-papers on the table. The captain reads, straightens, and waves you through with a respectful bow.", consume:null },
+          { label:"Show your authority", weight:9, valence:"good", boostItem:"Seal of office", boostAmt:3.2, text:"A glimpse of your seal changes everything. The guards nearly trip bowing you through.", flag:"road_news" },
+          { label:"Present papers", weight:8, valence:"good", text:"Your bearing and story satisfy them. They wave you through with a bow.", hp:0 },
+          { label:"Talk your way through", weight:7, valence:"good", boostItem:"Coin purse", boostAmt:2.2, text:"A joke, a small gift, a flattered captain. The gate opens.", hp:0, item:"Traveler's pass" },
+          { label:"Bluster", weight:8, valence:"bad", text:"They dislike your tone and search your things roughly, confiscating a valuable.", hp:-2 },
           { label:"Slip around at night", weight:6, valence:"neutral", text:"You take the smuggler's path over the hill. Slower, colder, but unseen.", hp:-3 },
         ] } } },
 
@@ -364,8 +366,163 @@ DATA.encounters = [
       spin:{ prompt:"Cross the killing-field.", stat:"wis",
         options:[
           { label:"Take arms from the dead", weight:9, valence:"good", text:"You gather good steel and coin the dead no longer need. War provisions the survivors.", item:"Battlefield spoils" },
-          { label:"Give them rites", weight:7, valence:"good", text:"You pause to pray over the fallen strangers. A wandering monk joins you and walks on at your side.", comp:"monk_frnd", flag:"honored_dead" },
+          { label:"Give them rites", weight:7, valence:"good", boostItem:"Sutra scroll", boostAmt:2.4, text:"You pause to pray over the fallen strangers. A wandering monk joins you and walks on at your side.", comp:"monk_frnd", flag:"honored_dead" },
           { label:"Search for survivors", weight:6, valence:"good", text:"Beneath a horse you find a living ashigaru who swears his spear to the one who dug him out.", hp:-2, comp:"ashigaru" },
           { label:"Hurry past", weight:8, valence:"bad", text:"You flee the crows and the smell. The images ride with you into your dreams.", flag:"haunted" },
+        ] } } },
+
+  /* ========================================================================
+   *  ITEM-INFLUENCED & CLASS-SPECIFIC ENCOUNTERS
+   *  Options with `needItem` only appear if you hold the item; `boostItem`
+   *  fattens that option's slice when you carry it. Items can be spent
+   *  (`consume`). Carrying the right thing visibly bends the wheel.
+   * ===================================================================== */
+
+  { id:"wandering_preacher", title:"The Roadside Sermon", loc:["road","rural","outskirts","shrine","any"], circles:["religious","any"], weight:6,
+    scene:{ text:"A crowd has gathered at a crossroads where a rival preacher damns your sect to a nodding, dangerous mob. They turn to see what you will say.",
+      spin:{ prompt:"Answer the preacher.", stat:"wis",
+        options:[
+          { label:"Recite from the sutra", weight:8, valence:"good", needItem:"Sutra scroll", text:"You unroll the scroll and read the true words aloud. The mob's temper turns to shame, then reverence. A convert follows you out.", comp:"monk_frnd", flag:"temple_ally" },
+          { label:"Out-argue him", weight:8, valence:"good", boostItem:"Sutra scroll", boostAmt:2.0, text:"You dismantle his doctrine point by point. The crowd laughs him down the road.", flag:"temple_ally" },
+          { label:"Walk on quietly", weight:7, valence:"neutral", text:"You judge the mob unwinnable and slip away before it turns. Discretion, not cowardice.", hp:0 },
+          { label:"Shout him down", weight:6, valence:"bad", text:"Heat meets heat. The sermon becomes a brawl, and you come away bruised and no holier.", hp:-6 },
+        ] } } },
+
+  { id:"haunted_pass", title:"The Restless Spirit", loc:["forest","mountain","wild","river","any"], circles:["any"], weight:6,
+    scene:{ text:"A cold weight settles on the path. A drowned-pale figure bars the way, mouth working soundlessly — an onryō, a spirit that cannot rest.",
+      spin:{ prompt:"Face the ghost.", stat:"wis",
+        options:[
+          { label:"Perform the purification", weight:14, valence:"good", needItem:"Purification wand", text:"You shake the wand of paper streamers and speak the rite. The spirit unclenches, bows, and dissolves like mist at dawn. Something in you settles too.", flag:"laid_to_rest", rmFlag:"haunted" },
+          { label:"Chant it to rest", weight:7, valence:"good", boostItem:"Sutra scroll", boostAmt:2.2, text:"Your steady chanting reaches whatever is left of the drowned soul. It fades, grateful.", flag:"laid_to_rest", rmFlag:"haunted" },
+          { label:"Press through the cold", weight:7, valence:"bad", text:"You walk into it. The chill reaches your marrow, and the face rides behind your eyes for days.", hp:-9, flag:"haunted" },
+          { label:"Flee the pass", weight:6, valence:"neutral", text:"You take the long way round, heart hammering. Some things are not yours to solve.", hp:-2 },
+        ] } } },
+
+  { id:"locked_storehouse", title:"The Daimyō's Storehouse", loc:["city","edo","kyoto","outskirts"], circles:["criminal","warrior","wanderer","any"], weight:5, minStep:3,
+    scene:{ text:"A tax-storehouse, fat with hoarded rice while the district starves. Guards doze at a barred side-door. Opportunity, and risk.",
+      spin:{ prompt:"How do you get inside?", stat:"wis",
+        options:[
+          { label:"Smoke and shadow", weight:12, valence:"good", needItem:"Smoke bombs", text:"A hiss of smoke, a swift climb, and you are past the choking guards. You leave with a purse and a sack of rice for the district.", consume:"Smoke bombs", item:"Storehouse takings", flag:"beloved" },
+          { label:"Pick the lock", weight:8, valence:"good", boostItem:"Grappling hook", boostAmt:2.0, text:"Patient fingers beat the old lock. You take what you can carry and melt away.", item:"Storehouse takings" },
+          { label:"Bluff the guards", weight:7, valence:"neutral", text:"You pose as an inspector. It half-works; you leave empty-handed but unremembered.", hp:0 },
+          { label:"Force the door", weight:7, valence:"bad", text:"Noise brings spears. You escape over the wall with a gash and nothing to show.", hp:-11, flag:"hunted" },
+        ] } } },
+
+  { id:"drinking_contest", title:"The Drinking Contest", loc:["city","edo","kyoto","rural","farm","any"], circles:["low","entertainer","criminal","any"], weight:6,
+    scene:{ text:"A red-faced ronin slams down his cup and challenges the room. Wagers pile up. The crowd chants for a champion.",
+      spin:{ prompt:"Do you take the challenge?", stat:"cha",
+        options:[
+          { label:"Match him cup for cup", weight:10, valence:"good", boostItem:"Sake flask", boostAmt:2.6, text:"Your seasoned liver wins the day and the pot. The beaten ronin laughs and buys the next round himself.", item:"Wager winnings", consume:"Sake flask" },
+          { label:"Cheat with water", weight:7, valence:"good", text:"You bribe the pourer to water your cups. You 'win' clear-headed, richer, and only a little ashamed.", item:"Wager winnings" },
+          { label:"Bow out", weight:7, valence:"neutral", text:"You know your limits. The crowd jeers, briefly, then forgets you.", hp:0 },
+          { label:"Drink to ruin", weight:8, valence:"bad", text:"Pride outlasts sense. You wake in a gutter, purse gone, head splitting.", hp:-7 },
+        ] } } },
+
+  { id:"forge_commission", title:"A Blade Worth Making", loc:["city","edo","kyoto","outskirts"], circles:["artisan","warrior","any"], weight:5,
+    scene:{ text:"A grim captain lays a shattered heirloom sword on the counter. 'Reforge it before we march, and name your price. Fail, and answer for it.'",
+      spin:{ prompt:"Work the steel.", stat:"str",
+        options:[
+          { label:"Fold it true", weight:9, valence:"good", boostItem:"Whetstone", boostAmt:2.6, text:"Fire, hammer, and prayer to Inari. The reborn blade sings. The captain overpays and owes you a favor.", item:"Captain's payment", flag:"patron" },
+          { label:"Rush the work", weight:8, valence:"bad", text:"Haste hides a flaw in the tang. The blade holds — for now. You take the coin and pray it lasts.", item:"Hasty payment", hp:-2 },
+          { label:"Refuse the job", weight:6, valence:"neutral", text:"You will not put your mark on a doomed rush-job. He scowls and takes his steel elsewhere.", hp:0 },
+        ] } } },
+
+  { id:"court_poetry", title:"The Poetry Contest", loc:["kyoto","city","shrine"], circles:["noble","entertainer","religious"], weight:5,
+    scene:{ text:"At a moonviewing, the assembled court trades linked verse. A sharp-eyed lady sets you a topic and waits, fan half-raised, to be impressed or amused.",
+      spin:{ prompt:"Offer your verse.", stat:"cha",
+        options:[
+          { label:"A flawless linked-verse", weight:9, valence:"good", boostItem:"Poem card", boostAmt:2.4, text:"Your verse turns on a single word like a key. The court murmurs; a powerful patron marks your name approvingly.", flag:"patron" },
+          { label:"A daring, improper jest", weight:7, valence:"good", boostItem:"Dance fan", boostAmt:1.9, text:"You risk a wicked pun. The lady laughs aloud — and a door at court opens for you.", flag:"patron" },
+          { label:"A safe, dull couplet", weight:8, valence:"neutral", text:"You commit no crime against poetry and win no glory either. You are, at least, remembered as harmless.", hp:0 },
+          { label:"Stammer and fail", weight:6, valence:"bad", text:"The words desert you. Behind polite fans, the court files you away as provincial.", flag:"marked" },
+        ] } } },
+
+  { id:"poison_offer", title:"The Quiet Commission", loc:["city","edo","kyoto"], circles:["criminal","warrior","wanderer"], weight:5, minStep:2,
+    scene:{ text:"A veiled go-between slides a folded paper across the table. 'A name, a price, and a season to do it in. My masters value discretion — and reward it.'",
+      spin:{ prompt:"Consider the dark contract.", stat:"wis",
+        options:[
+          { label:"Accept the contract", weight:9, valence:"good", boostItem:"Vial of poison", boostAmt:2.6, quest:"contract", text:"You take the paper. Whatever you were before, you are now a knife for hire — and a very expensive one.", flag:"underworld" },
+          { label:"Name a steeper price", weight:7, valence:"good", boostItem:"Smoke bombs", boostAmt:1.8, quest:"contract", text:"You haggle coldly. They pay it, which tells you the target is powerful — and the payment, real.", flag:"underworld", item:"Advance payment" },
+          { label:"Refuse and forget", weight:7, valence:"neutral", text:"You slide the paper back unread. Some coin is too heavy to carry. The go-between vanishes.", hp:0 },
+          { label:"Threaten to expose them", weight:5, valence:"bad", text:"Bad idea. By nightfall you are the one being hunted through the lantern-lit streets.", flag:"hunted", hp:-4 },
+        ] } } },
+
+  /* ========================================================================
+   *  DESTINY: encounters that CHANGE (or ruin) the road you are on.
+   *  Based on where you are, who you are, and what you seek. Gated `once`
+   *  and by `minStep` so they land like turning-points, not noise.
+   * ===================================================================== */
+
+  { id:"old_enemy", title:"A Face from the Ash", loc:["any"], circles:["any"], weight:5, once:true, minStep:3,
+    scene:{ text:"Across a crowded ford-town you see him: the man whose order burned your old life to the ground. He has not seen you. Yet.",
+      spin:{ prompt:"What rises in you?", stat:"wis",
+        options:[
+          { label:"Swear the vendetta", weight:10, valence:"good", quest:"revenge", flag:"vendetta", text:"The old cold fire wakes and will not be smothered. From this hour your road has one purpose, and it wears his face.", hp:0 },
+          { label:"Follow, and learn his path", weight:7, valence:"good", quest:"revenge", flag:"vendetta", text:"You shadow him to learn his routes and his guards. Patience is the vendetta's truest blade.", item:"Enemy's itinerary" },
+          { label:"Let the dead stay buried", weight:7, valence:"neutral", text:"You turn away. The past is a country you refuse to re-enter. It costs you something to do it.", flag:"resolved", hp:2 },
+        ] } } },
+
+  { id:"the_reckoning", title:"The Reckoning", loc:["any"], circles:["any"], weight:8, once:true, minStep:8, requiresQuest:"revenge",
+    scene:{ text:"The hunt ends here, in a rain-dark courtyard. Your enemy turns, older than your memory of him, and knows you at once. 'So,' he says. 'You lived.'",
+      spin:{ prompt:"Finish it.", stat:"str",
+        options:[
+          { label:"Cut him down", weight:9, valence:"good", boostItem:"Enemy's itinerary", boostAmt:2.2, text:"Your foreknowledge undoes his guards; your blade undoes him. It is over. The grey quiet you feel is not what you imagined.", flag:"resolved", hp:-6 },
+          { label:"Best him, then spare him", weight:6, valence:"good", text:"You beat him to his knees — and stay your hand. Mercy is a heavier blow than steel; you walk away changed, and free of it.", flag:"resolved", maxhp:3 },
+          { label:"Strike in blind fury", weight:8, valence:"bad", text:"Rage makes you clumsy. You kill him, yes — but his guards open you to the bone in the doing.", flag:"resolved", hp:-16 },
+        ] } } },
+
+  { id:"sacred_summons", title:"The Summons in the Smoke", loc:["shrine","sacred","mountain","forest","any"], circles:["any"], weight:5, once:true, minStep:2,
+    scene:{ text:"In incense-smoke at a wayside altar, a certainty takes you: there is a far shrine, and it is calling. The feeling is older than reason.",
+      spin:{ prompt:"Do you heed the call?", stat:"wis",
+        options:[
+          { label:"Vow the pilgrimage", weight:10, valence:"good", quest:"pilgrimage", text:"You bow and accept. Wherever you were bound, you are bound now for the far shrine, and the walk itself becomes the point.", flag:"blessed_omen" },
+          { label:"Seek only understanding", weight:7, valence:"good", quest:"enlighten", text:"Not a place but a seeing — that is what you want now. You resolve to walk until the world goes clear.", flag:"centered" },
+          { label:"Shake it off", weight:7, valence:"neutral", text:"You are no saint and say so. Still, the feeling leaves a mark, like a door you chose not to open.", hp:1 },
+        ] } } },
+
+  { id:"war_council", title:"The War-Fan Offered", loc:["edo","kyoto","city","road"], circles:["noble","warrior"], weight:6, once:true, minStep:4,
+    scene:{ text:"A great lord's envoy kneels before you with a lacquered war-fan on outstretched hands. 'My master gathers the provinces. He asks not for your sword, but for your name beside his.'",
+      spin:{ prompt:"How large is your ambition?", stat:"cha",
+        options:[
+          { label:"Seize the whole realm", weight:8, valence:"good", boostItem:"Seal of office", boostAmt:2.4, quest:"unify", text:"Why serve a unifier when you might BE one? You take the fan for yourself. The wars ahead are now yours to win.", flag:"patron" },
+          { label:"Swear to his cause", weight:9, valence:"good", boostItem:"Clan crest", boostAmt:2.0, quest:"duty", text:"You pledge your name to his banner. A retainer is assigned to your service that very hour.", comp:"retainer", flag:"sworn_service" },
+          { label:"Broker peace instead", weight:6, valence:"good", quest:"alliance", text:"You counter: not conquest, but coalition. The envoy's eyes narrow with interest. A subtler game begins.", flag:"patron" },
+          { label:"Refuse all of it", weight:6, valence:"neutral", text:"You want no lord's fate on your shoulders. The envoy bows, disappointed, and withdraws.", hp:0 },
+        ] } } },
+
+  { id:"gold_rumor", title:"The Whisper of Gold", loc:["city","edo","kyoto","coast","road","any"], circles:["merchant","wanderer","low","any"], weight:6, once:true, minStep:2,
+    scene:{ text:"A drunk factor, thinking you a partner, lets slip a route: a river-gold strike, a starving daimyō desperate to sell, a fortune for whoever moves first.",
+      spin:{ prompt:"Chase the fortune?", stat:"wis",
+        options:[
+          { label:"Bet everything on it", weight:9, valence:"good", boostItem:"Coin purse", boostAmt:2.2, quest:"fortune", text:"You commit. From this day your road bends toward coin, cargo, and the sweet arithmetic of profit.", item:"Seed capital" },
+          { label:"Verify, then invest", weight:7, valence:"good", boostItem:"Trade ledger", boostAmt:2.0, quest:"fortune", text:"You check the story against your ledger before leaping. It holds. The venture — and your new purpose — is launched.", flag:"road_news" },
+          { label:"Dismiss it as a lie", weight:7, valence:"neutral", text:"You have heard a hundred such tales. You let this one pass with the drunk who told it.", hp:0 },
+        ] } } },
+
+  { id:"false_charge", title:"Branded", loc:["city","edo","kyoto","outskirts","road"], circles:["any"], weight:5, once:true, minStep:3, forbidFlag:"sworn_service",
+    scene:{ text:"Soldiers seize you in the street for a crime you did not commit — a magistrate needs a culprit and your face will do. Your old life ends in an eyeblink.",
+      spin:{ prompt:"The trap closes. React.", stat:"cha",
+        options:[
+          { label:"Talk, then vanish", weight:9, valence:"good", quest:"escape", text:"You spin doubt into the magistrate's certainty long enough to slip the cordon. Whatever you were, you are a runaway now — and freedom is the only quest that matters.", hp:-2 },
+          { label:"Break free by force", weight:7, valence:"bad", quest:"escape", text:"You fight clear of their hands and run, but a captain marks your face for the wanted-books.", hp:-8, flag:"hunted" },
+          { label:"Bribe the magistrate", weight:6, valence:"good", boostItem:"Coin purse", boostAmt:2.6, quest:"escape", text:"Coin finds the crack in his righteousness. You buy your way loose and a half-day's head start.", consume:"Coin purse" },
+        ] } } },
+
+  { id:"meditation_road", title:"Stillness on the Road", loc:["shrine","sacred","mountain","forest","wild"], circles:["religious","any"], weight:6,
+    scene:{ text:"A flat stone, a shaft of light through cedars, and — rarely — the time to simply sit. The war seems very far away.",
+      spin:{ prompt:"Sit with the silence.", stat:"wis",
+        options:[
+          { label:"Breathe until the noise fades", weight:10, valence:"good", boostItem:"Sutra scroll", boostAmt:1.8, text:"Thought by thought the clamor settles. You rise clear-eyed, the road ahead simpler than it was.", flag:"centered", hp:3 },
+          { label:"Rest the body only", weight:8, valence:"neutral", text:"Your mind churns on, but your legs are grateful for the pause.", hp:4 },
+          { label:"Too restless to sit", weight:6, valence:"bad", text:"The war lives behind your eyes and will not be stilled. You move on more tired than before.", hp:-1 },
+        ] } } },
+
+  { id:"sworn_ally", title:"An Oath Under the Pine", loc:["any"], circles:["warrior","noble","religious","any"], weight:5, once:true, minStep:6, requiresQuest:["unify","duty","alliance"],
+    scene:{ text:"A wavering minor lord meets you beneath an old pine. His spears could tip your cause — if your words are worth his risk.",
+      spin:{ prompt:"Bind him to you.", stat:"cha",
+        options:[
+          { label:"Pledge mutual faith", weight:9, valence:"good", boostItem:"Seal of office", boostAmt:2.2, text:"You trade solemn oaths beneath the pine. His banner is yours; your cause gains weight and men.", flag:"sworn_service", comp:"retainer" },
+          { label:"Offer him the better bargain", weight:7, valence:"good", boostItem:"Coin purse", boostAmt:1.8, text:"You sweeten faith with gold and rank. Mercenary, but his spears are just as sharp for it.", flag:"patron" },
+          { label:"Overreach in your demands", weight:7, valence:"bad", text:"You ask too much, too fast. He balks, and word spreads that you are grasping.", flag:"marked" },
         ] } } },
 ];
