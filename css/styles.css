@@ -129,6 +129,24 @@ body{
 .slot.trait-innocent{background:#e6d68a;}
 .slot.trait-liability{background:#8a8a8a;}
 
+/* illustrated tiles + click affordance */
+.slot.filled{cursor:pointer;}
+.slot.art{padding:0;overflow:hidden;background:transparent;position:relative;transition:transform .08s ease,box-shadow .12s ease;}
+.slot.art .tile-svg{width:100%;height:100%;display:block;}
+.slot.art:hover{transform:translateY(-2px);box-shadow:0 3px 10px rgba(0,0,0,.45),0 0 0 1px var(--gold);}
+.slot.art:active{transform:translateY(0);}
+
+/* item / companion detail popup */
+.detail-head{display:flex;gap:14px;align-items:center;margin-bottom:4px;}
+.detail-art{width:66px;height:66px;flex:0 0 66px;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px var(--line);}
+.detail-art .tile-svg{width:100%;height:100%;display:block;}
+.detail-name{font-family:'Yuji Syuku',serif;color:var(--gold);margin:0 0 3px;font-size:1.15rem;font-weight:400;}
+.detail-sub{color:var(--gold-soft);font-size:.72rem;margin:0;text-transform:uppercase;letter-spacing:.09em;}
+.detail-desc{color:var(--paper);font-size:.9rem;line-height:1.55;margin:8px 0 0;}
+.detail-benefit{color:var(--paper);font-size:.9rem;line-height:1.55;margin:0;}
+.detail-tag{display:inline-block;background:var(--crimson);color:var(--paper);font-size:.66rem;font-weight:700;
+  padding:2px 7px;border-radius:5px;margin-right:7px;text-transform:uppercase;letter-spacing:.06em;vertical-align:middle;}
+
 /* ---------------- journal ---------------- */
 .journalwrap{flex:1;min-height:180px;display:flex;flex-direction:column;}
 .journal{overflow-y:auto;flex:1;max-height:34vh;padding-right:6px;font-size:.85rem;line-height:1.55;}
