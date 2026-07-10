@@ -33,7 +33,7 @@ body{
 /* ---------------- layout ---------------- */
 .app{
   display:grid;
-  grid-template-columns:210px 1fr 340px;
+  grid-template-columns:238px 1fr 340px;
   gap:18px;
   padding:18px;
   min-height:100vh;
@@ -58,7 +58,21 @@ body{
 .ctl-crimson{background:var(--crimson-deep);border-color:var(--crimson);}
 .ctl-crimson:hover{background:var(--crimson);border-color:var(--gold-soft);}
 .ctl-gold{color:var(--gold-soft);border-color:var(--gold);}
-.left-note{font-size:.76rem;color:var(--paper-dim);line-height:1.5;padding:6px 4px;border-top:1px solid var(--line);margin-top:4px;}
+.left-note{display:none;}
+
+/* the illustrated journey scene, in an old lacquer-and-gold frame */
+.scene-frame{
+  margin-top:6px;position:relative;border-radius:8px;
+  padding:9px;background:
+    linear-gradient(180deg,#161a2b,#10131f);
+  border:2px solid var(--gold);
+  box-shadow:0 0 0 3px #0c0e17, 0 0 0 4px rgba(212,162,75,.35), var(--shadow);
+}
+.scene-frame::before{
+  content:"";position:absolute;inset:4px;border:1px solid rgba(212,162,75,.5);
+  border-radius:5px;pointer-events:none;
+}
+#scene-svg{display:block;width:100%;height:auto;border-radius:3px;}
 
 /* ---------------- center ---------------- */
 .col-center{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:6px;}
