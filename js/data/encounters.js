@@ -25,9 +25,10 @@ DATA.encounters = [
       spin:{ prompt:"How do you answer the brigands?", stat:"str",
         options:[
           { label:"Fight through", weight:10, valence:"good", text:"Your blade speaks first and last. Two flee; one does not rise. You take his coin.", hp:-6, item:"Bandit's purse" },
-          { label:"Cut them down", weight:8, valence:"bad", text:"They were more than they looked. You win, but a spear opens your side.", hp:-14 },
+          { label:"Cut them down", weight:8, valence:"bad", text:"They were more than they looked. A spear-butt cracks your skull, and you wake with your hands bound behind you.", hp:-6, predicament:"ransom" },
           { label:"Pay the toll", weight:9, valence:"neutral", text:"You hand over coin and swallow your pride. They let you pass, laughing.", hp:0 },
           { label:"Talk past", weight:7, valence:"good", text:"You name a warlord they fear and imply his patronage. They melt back into the trees.", hp:0 },
+          { label:"Run for it", weight:6, valence:"bad", text:"You bolt. They run you down in the pines, laughing, and truss you like a boar for market.", predicament:"ransom" },
         ] } } },
 
   { id:"wounded", title:"The Wounded Traveler", loc:["road","wild","rural","any"], circles:["any"], weight:8,
@@ -48,7 +49,7 @@ DATA.encounters = [
           { label:"Show your authority", weight:9, valence:"good", boostItem:"Seal of office", boostAmt:3.2, text:"A glimpse of your seal changes everything. The guards nearly trip bowing you through.", flag:"road_news" },
           { label:"Present papers", weight:8, valence:"good", text:"Your bearing and story satisfy them. They wave you through with a bow.", hp:0 },
           { label:"Talk your way through", weight:7, valence:"good", boostItem:"Coin purse", boostAmt:2.2, text:"A joke, a small gift, a flattered captain. The gate opens.", hp:0, item:"Traveler's pass" },
-          { label:"Bluster", weight:8, valence:"bad", text:"They dislike your tone and search your things roughly, confiscating a valuable.", hp:-2 },
+          { label:"Bluster", weight:8, valence:"bad", text:"They dislike your tone. Then someone recognizes your face from the wanted-book, and hands close on your arms.", predicament:"jail" },
           { label:"Slip around at night", weight:6, valence:"neutral", text:"You take the smuggler's path over the hill. Slower, colder, but unseen.", hp:-3 },
         ] } } },
 
@@ -405,7 +406,7 @@ DATA.encounters = [
           { label:"Smoke and shadow", weight:12, valence:"good", needItem:"Smoke bombs", text:"A hiss of smoke, a swift climb, and you are past the choking guards. You leave with a purse and a sack of rice for the district.", consume:"Smoke bombs", item:"Storehouse takings", flag:"beloved" },
           { label:"Pick the lock", weight:8, valence:"good", boostItem:"Grappling hook", boostAmt:2.0, text:"Patient fingers beat the old lock. You take what you can carry and melt away.", item:"Storehouse takings" },
           { label:"Bluff the guards", weight:7, valence:"neutral", text:"You pose as an inspector. It half-works; you leave empty-handed but unremembered.", hp:0 },
-          { label:"Force the door", weight:7, valence:"bad", text:"Noise brings spears. You escape over the wall with a gash and nothing to show.", hp:-11, flag:"hunted" },
+          { label:"Force the door", weight:7, valence:"bad", text:"Wood splinters loud in the night. Torches bloom, spears level, and the district watch drags you down.", hp:-6, predicament:"jail" },
         ] } } },
 
   { id:"drinking_contest", title:"The Drinking Contest", loc:["city","edo","kyoto","rural","farm","any"], circles:["low","entertainer","criminal","any"], weight:6,
@@ -524,5 +525,33 @@ DATA.encounters = [
           { label:"Pledge mutual faith", weight:9, valence:"good", boostItem:"Seal of office", boostAmt:2.2, text:"You trade solemn oaths beneath the pine. His banner is yours; your cause gains weight and men.", flag:"sworn_service", comp:"retainer" },
           { label:"Offer him the better bargain", weight:7, valence:"good", boostItem:"Coin purse", boostAmt:1.8, text:"You sweeten faith with gold and rank. Mercenary, but his spears are just as sharp for it.", flag:"patron" },
           { label:"Overreach in your demands", weight:7, valence:"bad", text:"You ask too much, too fast. He balks, and word spreads that you are grasping.", flag:"marked" },
+        ] } } },
+
+  { id:"night_theft", title:"A Hand in the Dark", loc:["city","edo","kyoto","outskirts"], circles:["criminal","low","wanderer","any"], weight:6, minStep:2,
+    scene:{ text:"A merchant's purse hangs fat and unguarded at his obi in the festival crush. One cut of the string and you eat for a month.",
+      spin:{ prompt:"Take the purse?", stat:"wis",
+        options:[
+          { label:"A clean lift", weight:9, valence:"good", boostItem:"Vial of poison", boostAmt:1.6, text:"String parts, purse vanishes, and you are three stalls away before he feels the breeze.", item:"Hidden coin" },
+          { label:"Melt into the crowd", weight:7, valence:"neutral", text:"Something feels wrong. You let the mark pass and keep your hands empty and free.", hp:0 },
+          { label:"A hand clamps your wrist", weight:8, valence:"bad", text:"The 'merchant' was bait. A constable's grip closes on you, and the crowd parts to watch you taken.", predicament:"jail" },
+        ] } } },
+
+  { id:"mountain_ambush", title:"Ambush on the Pass", loc:["mountain","forest","wild","tokaido","road"], circles:["any"], weight:6, minStep:2,
+    scene:{ text:"The trail narrows between two boulders — and that is where they were always going to be. A dozen hill-bandits rise from the scrub, and you are one.",
+      spin:{ prompt:"Caught in the trap.", stat:"str",
+        options:[
+          { label:"Break through the line", weight:8, valence:"good", boostItem:"Smoke bombs", boostAmt:2.2, text:"You hit the weakest point and burst clear, running until your lungs burn.", hp:-5 },
+          { label:"Stand and sell yourself dear", weight:6, valence:"good", boostItem:"Nanban matchlock", boostAmt:2.6, text:"One thunderclap of foreign fire, and the survivors decide you are not worth it.", hp:-4, item:"Ambusher's spoils" },
+          { label:"Dragged down by numbers", weight:9, valence:"bad", text:"There are simply too many. A club finds your temple, and the world goes dark. You wake bound.", predicament:"ransom" },
+        ] } } },
+
+  { id:"press_gang", title:"The Recruiters", loc:["road","tokaido","rural","farm","outskirts","city"], circles:["low","peasant","warrior","wanderer","any"], weight:6, minStep:3, forbidFlag:"sworn_service",
+    scene:{ text:"A muster-sergeant with a squad at his back blocks the road, eyeing your legs and arms like a farmer eyeing an ox. 'Strong one. His lordship needs spears.'",
+      spin:{ prompt:"Avoid the muster?", stat:"cha",
+        options:[
+          { label:"Talk your way past", weight:9, valence:"good", boostItem:"Travel papers", boostAmt:2.4, text:"Papers, a title, a lord's name — you give him reasons enough to wave you on.", hp:0 },
+          { label:"Buy him off", weight:7, valence:"good", needItem:"Coin purse", consume:"Coin purse", text:"A coin in the sergeant's palm buys a sudden blindness. He finds another ox.", },
+          { label:"Show your rank", weight:8, valence:"good", boostItem:"Clan crest", boostAmt:2.4, text:"Your crest turns the sergeant's greed to a hasty bow. He seeks his spears elsewhere.", hp:0 },
+          { label:"Shoved into the line", weight:9, valence:"bad", text:"There is no arguing with six spears. They take your name, your freedom, and your afternoon.", predicament:"conscript" },
         ] } } },
 ];
