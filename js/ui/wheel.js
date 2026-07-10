@@ -1,31 +1,34 @@
 /* ============================================================================
  *  wheel.js — the Wheel of the Warring States
  *  --------------------------------------------------------------------------
- *  Renders N equal wedges (fair-looking), then spins to a pre-chosen winner
- *  index. Pointer sits at 3 o'clock (0°), matching the reference layout.
+ *  Renders N equal wedges (fair-looking). The colored wedges spin, but every
+ *  label stays HORIZONTAL and upright at all times — labels orbit the hub
+ *  rather than rotating with it, so no option is ever upside-down. The winner
+ *  always comes to rest dead-centre beneath the pointer at 3 o'clock (0°).
  * ========================================================================== */
 window.WHEEL = (function () {
   const NS = "http://www.w3.org/2000/svg";
-  const CX = 150, CY = 150, R = 132;
+  const CX = 150, CY = 150, R = 132, RLABEL = 84;
   const PALETTE = [
     "#b83227", "#2b6e78", "#3f7d4e", "#c58a2b",
     "#6c4f7a", "#a35232", "#3a6f92", "#7c8b3a",
   ];
+  const DUR = 4100; // ms
 
-  let rotGroup, cumulative = 0, spinning = false, segCount = 0;
-  let onDone = null;
+  let wedgeGroup, labelLayer, labels = [], wedges = [], segCount = 0;
+  let currentRot = 0, spinning = false, rafId = null;
 
   function el(tag, attrs) {
     const e = document.createElementNS(NS, tag);
     for (const k in attrs) e.setAttribute(k, attrs[k]);
     return e;
   }
-  function pt(a) {
-    const r = (a * Math.PI) / 180;
-    return [CX + R * Math.cos(r), CY + R * Math.sin(r)];
+  function pt(a, r) {
+    const rad = (a * Math.PI) / 180;
+    return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)];
   }
   function arcPath(a0, a1) {
-    const [x0, y0] = pt(a0), [x1, y1] = pt(a1);
+    const [x0, y0] = pt(a0, R), [x1, y1] = pt(a1, R);
     const large = a1 - a0 > 180 ? 1 : 0;
     return `M ${CX} ${CY} L ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1} Z`;
   }
@@ -38,95 +41,129 @@ window.WHEEL = (function () {
       else cur = (cur + " " + w).trim();
     }
     if (cur) lines.push(cur);
-    return lines.slice(0, 2);
+    return lines.slice(0, 3);
   }
 
   function render(segments) {
     const svg = document.getElementById("wheel-svg");
     svg.innerHTML = "";
     segCount = segments.length;
-    cumulative = 0;
+    currentRot = 0;
+    labels = []; wedges = [];
 
-    // static gold ring + backing
-    svg.appendChild(el("circle", { cx: CX, cy: CY, r: R + 8, fill: "#0c0d15" }));
-    const ring = el("circle", { cx: CX, cy: CY, r: R + 5, fill: "none",
-      stroke: "url(#goldGrad)", "stroke-width": 8 });
-    svg.appendChild(ring);
-
-    rotGroup = el("g", { id: "wheel-rot" });
-    rotGroup.style.transition = "none";
-    rotGroup.style.transform = "rotate(0deg)";
-    rotGroup.style.transformOrigin = "150px 150px";
-    svg.appendChild(rotGroup);
-
-    const seg = 360 / segCount;
-    const fontSize = segCount > 6 ? 8.5 : segCount > 4 ? 10 : 11.5;
+    // wedge angular sizes ∝ weight (so a fatter slice = a genuinely higher
+    // chance). A floor keeps tiny-odds slices readable, then we renormalise.
+    const hasW = segments.some(s => typeof s.weight === "number");
+    let sizes = segments.map(s => hasW ? Math.max(0.0001, s.weight || 0) : 1);
+    const total0 = sizes.reduce((a, b) => a + b, 0) || 1;
+    const floor = 0.055; // each wedge at least ~5.5% of the wheel
+    sizes = sizes.map(w => w / total0);
+    sizes = sizes.map(f => Math.max(floor, f));
+    const total = sizes.reduce((a, b) => a + b, 0);
+    sizes = sizes.map(f => f / total);
+    // cumulative angles
+    let acc = 0;
     for (let i = 0; i < segCount; i++) {
-      const a0 = i * seg, a1 = a0 + seg, mid = a0 + seg / 2;
-      rotGroup.appendChild(el("path", {
-        d: arcPath(a0, a1),
+      const a0 = acc * 360, a1 = (acc + sizes[i]) * 360;
+      wedges.push({ a0, a1, mid: (a0 + a1) / 2, frac: sizes[i] });
+      acc += sizes[i];
+    }
+
+    // static backing + gold ring
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: R + 8, fill: "#0c0d15" }));
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: R + 5, fill: "none",
+      stroke: "url(#goldGrad)", "stroke-width": 8 }));
+
+    // rotating wedges (colours only — no text lives in here)
+    wedgeGroup = el("g", { id: "wheel-rot" });
+    wedgeGroup.style.transformOrigin = "150px 150px";
+    svg.appendChild(wedgeGroup);
+    for (let i = 0; i < segCount; i++) {
+      wedgeGroup.appendChild(el("path", {
+        d: arcPath(wedges[i].a0, wedges[i].a1),
         fill: PALETTE[i % PALETTE.length],
         stroke: "#1a1620", "stroke-width": 1.5,
       }));
-      // label runs along the radius; flip on the left half for legibility
-      const flip = mid > 90 && mid < 270;
-      const rot = flip ? mid + 180 : mid;
-      const anchor = flip ? "start" : "end";
-      const tx = CX + (R - 12) * Math.cos((mid * Math.PI) / 180);
-      const ty = CY + (R - 12) * Math.sin((mid * Math.PI) / 180);
-      const lines = wrap(segments[i].label, segCount > 6 ? 14 : 18);
-      const g = el("text", {
-        x: tx, y: ty, fill: "#f6efe0", "font-size": fontSize,
-        "font-family": "'Zen Kaku Gothic New', sans-serif", "font-weight": 700,
-        "text-anchor": anchor, transform: `rotate(${rot} ${tx} ${ty})`,
-        style: "paint-order:stroke;stroke:#00000055;stroke-width:2px;",
-      });
-      lines.forEach((ln, li) => {
-        const ts = el("tspan", { x: tx, dy: li === 0 ? (lines.length > 1 ? -3 : 0) : fontSize + 1 });
-        ts.textContent = ln;
-        g.appendChild(ts);
-      });
-      rotGroup.appendChild(g);
     }
 
-    // hub with ensō mark
+    // upright labels (orbit the hub, never tilt)
+    labelLayer = el("g", { id: "wheel-labels" });
+    svg.appendChild(labelLayer);
+    const fontSize = segCount > 6 ? 9 : segCount > 4 ? 10.5 : 12;
+    for (let i = 0; i < segCount; i++) {
+      const mid = wedges[i].mid;
+      const cap = wedges[i].frac < 0.09 ? 9 : (segCount > 6 ? 12 : 15);
+      const lines = wrap(segments[i].label, cap);
+      const t = el("text", {
+        fill: "#f8f2e4", "font-size": fontSize,
+        "font-family": "'Zen Kaku Gothic New', sans-serif", "font-weight": 700,
+        "text-anchor": "middle", "dominant-baseline": "middle",
+        style: "paint-order:stroke;stroke:#0a0a12;stroke-width:2.4px;stroke-linejoin:round;",
+      });
+      const tspans = lines.map(() => el("tspan", {}));
+      tspans.forEach((ts, li) => { ts.textContent = lines[li]; t.appendChild(ts); });
+      labelLayer.appendChild(t);
+      labels.push({ el: t, tspans, mid, nLines: lines.length, fs: fontSize });
+    }
+
+    // hub + ensō (static, drawn on top)
     svg.appendChild(el("circle", { cx: CX, cy: CY, r: 22, fill: "#0e0f18",
       stroke: "url(#goldGrad)", "stroke-width": 3 }));
-    const enso = el("path", {
+    svg.appendChild(el("path", {
       d: "M 150 134 A 16 16 0 1 1 141 137",
       fill: "none", stroke: "#b83227", "stroke-width": 3.5, "stroke-linecap": "round",
-    });
-    svg.appendChild(enso);
+    }));
 
-    // force reflow so a later transition animates from 0
-    void svg.getBBox;
-    rotGroup.getBoundingClientRect();
+    layoutLabels(0);
   }
 
-  /* Spin so that segment `winnerIndex` stops beneath the pointer (0°). */
+  /* place every label horizontally at its orbital position for wheel angle `rot` */
+  function layoutLabels(rot) {
+    for (const L of labels) {
+      const [ax, ay] = pt(L.mid + rot, RLABEL);
+      const lh = L.fs + 1.5;
+      const y0 = ay - ((L.nLines - 1) / 2) * lh;
+      L.el.setAttribute("x", ax);
+      L.el.setAttribute("y", ay);
+      L.tspans.forEach((ts, li) => {
+        ts.setAttribute("x", ax);
+        ts.setAttribute("y", y0 + li * lh);
+      });
+    }
+  }
+
+  function setWedgeRot(rot) {
+    wedgeGroup.style.transform = `rotate(${rot}deg)`;
+  }
+
+  /* Spin so segment `winnerIndex` stops centred under the pointer (0°). */
   function spinTo(winnerIndex, cb) {
-    if (spinning || !rotGroup) return;
-    spinning = true; onDone = cb;
-    const seg = 360 / segCount;
-    const center = winnerIndex * seg + seg / 2;
-    // orientation that lands this segment's center at the pointer (0°)
-    const target = ((-center) % 360 + 360) % 360;
-    let delta = ((target - (cumulative % 360)) % 360 + 360) % 360;
-    const jitter = (Math.random() - 0.5) * seg * 0.55;
-    cumulative += delta + 360 * 5 + jitter;
-    rotGroup.style.transition = "transform 4.1s cubic-bezier(.15,.62,.18,1)";
-    // next frame, apply
-    requestAnimationFrame(() => {
-      rotGroup.style.transform = `rotate(${cumulative}deg)`;
-    });
-    const finish = () => {
-      rotGroup.removeEventListener("transitionend", finish);
-      spinning = false;
-      if (onDone) { const f = onDone; onDone = null; f(); }
-    };
-    rotGroup.addEventListener("transitionend", finish);
-    // safety fallback in case transitionend is missed
-    setTimeout(() => { if (spinning) finish(); }, 4600);
+    if (spinning || !wedgeGroup) return;
+    spinning = true;
+    const mid = wedges[winnerIndex] ? wedges[winnerIndex].mid : 0;
+    // rotation that brings this wedge's centre to 0° (mod 360)
+    const target = ((-mid) % 360 + 360) % 360;
+    let delta = ((target - (currentRot % 360)) % 360 + 360) % 360;
+    const startRot = currentRot;
+    const endRot = startRot + delta + 360 * 5;   // five full turns, exact landing
+    const t0 = performance.now();
+    const ease = p => 1 - Math.pow(1 - p, 3);     // easeOutCubic — decelerates
+
+    function frame(now) {
+      const p = Math.min(1, (now - t0) / DUR);
+      const rot = startRot + (endRot - startRot) * ease(p);
+      setWedgeRot(rot);
+      layoutLabels(rot);
+      if (p < 1) { rafId = requestAnimationFrame(frame); }
+      else {
+        currentRot = ((endRot % 360) + 360) % 360;
+        setWedgeRot(currentRot);
+        layoutLabels(currentRot);
+        spinning = false;
+        if (cb) cb();
+      }
+    }
+    rafId = requestAnimationFrame(frame);
   }
 
   function isSpinning() { return spinning; }

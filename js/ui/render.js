@@ -58,8 +58,10 @@ window.UI = (function () {
       else if (n.t === "hurt") { log(`✦ You take ${-n.v} damage.`, "loss"); sfx.bad(); }
       else if (n.t === "maxhp") { log(`✦ Your vigor deepens (+${n.v} max health).`, "gain"); }
       else if (n.t === "item") { log(`✦ Gained: ${n.v}.`, "gain"); }
+      else if (n.t === "consume") { log(`✦ You give up: ${n.v}.`, "loss"); }
       else if (n.t === "comp") { log(`✦ ${n.v} joins your journey.`, "gain"); }
       else if (n.t === "rmcomp") { log(`✦ ${n.v} parts from you.`, "loss"); }
+      else if (n.t === "quest") { log(`✦ Your destiny turns — you now walk the road of ${questLabel(n.v)}.`, "quest"); sfx.good(); }
     }
   }
   function rebuildJournal() {
