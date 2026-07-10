@@ -38,7 +38,8 @@
       else flash($("btn-load"), "No save found");
     };
     $("btn-how").onclick = () => { UI.sfx.click(); UI.modal("How to Play", HOW_TO, "To the road"); };
-    $("btn-mute").onclick = () => { UI.sfx.click(); UI.toggleMute(); };
+
+    if (window.SCENE) SCENE.reset();
 
     // resume if a save exists, otherwise fresh game
     if (STATE.hasSave() && STATE.load()) {
