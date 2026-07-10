@@ -128,6 +128,26 @@ window.GAME = (function () {
     });
   }
 
+  // build the option set for any spin: hides item-gated options you can't use,
+  // applies item bias, computes true weights, picks the winner.
+  function buildSpin(spin) {
+    const stat = spin.stat;
+    const eff = STATE.effStat(stat);
+    const luck = STATE.totalLuck();
+    let opts = spin.options.filter(o => !(o.needItem && !STATE.hasItem(o.needItem)));
+    if (opts.length < 1) opts = spin.options;
+    const bias = opts.map(o => {
+      let m = 1;
+      if (o.boostItem && STATE.hasItem(o.boostItem)) m *= (o.boostAmt || 2.6);
+      if (o.dampItem && STATE.hasItem(o.dampItem)) m *= (o.dampAmt || 0.4);
+      return m;
+    });
+    const weights = RNG.optionWeights(opts, stat, eff == null ? 0 : eff, luck, bias);
+    const widx = RNG.weightedIndex(weights);
+    const segs = opts.map((o, i) => ({ label: o.label, item: o, valence: o.valence, weight: weights[i] }));
+    return { stat, eff, opts, segs, widx };
+  }
+
   function runScene(enc, scene, isRest) {
     const S = STATE.get();
     if (enc.once) S.usedOnce[enc.id] = true;
@@ -137,30 +157,16 @@ window.GAME = (function () {
     UI.log(scene.text, "story");
 
     if (scene.spin) {
-      const stat = scene.spin.stat;
-      const eff = STATE.effStat(stat);
-      const luck = STATE.totalLuck();
-      // options requiring an item you don't hold are hidden from the wheel
-      let opts = scene.spin.options.filter(o => !(o.needItem && !STATE.hasItem(o.needItem)));
-      if (opts.length < 1) opts = scene.spin.options;
-      // carried items sway the odds of specific options
-      const bias = opts.map(o => {
-        let m = 1;
-        if (o.boostItem && STATE.hasItem(o.boostItem)) m *= (o.boostAmt || 2.6);
-        if (o.dampItem && STATE.hasItem(o.dampItem)) m *= (o.dampAmt || 0.4);
-        return m;
-      });
-      const weights = RNG.optionWeights(opts, stat, eff == null ? 0 : eff, luck, bias);
-      const widx = RNG.weightedIndex(weights);
-      const segs = opts.map((o, i) => ({ label: o.label, item: o, valence: o.valence, weight: weights[i] }));
+      const sp = buildSpin(scene.spin);
       UI.setTitle(scene.spin.prompt || enc.title);
-      UI.setSub(oddsHint(stat, eff, opts));
-      pendingSpin(segs, widx, (opt) => {
+      UI.setSub(oddsHint(sp.stat, sp.eff, sp.opts));
+      pendingSpin(sp.segs, sp.widx, (opt) => {
         UI.log(opt.text, opt.valence === "good" ? "good" : opt.valence === "bad" ? "bad" : "story");
         const notes = STATE.applyEffects(opt);
         UI.logNotes(notes);
         UI.renderSheet();
         if (STATE.get().hp <= 0 || STATE.get().forceEnding) { finishBeat(isRest, enc); return; }
+        if (STATE.get().pendingPredicament) { enterPredicament(isRest, enc); return; }
         if (opt.goto && enc.sub && enc.sub[opt.goto]) {
           pendingContinue("Continue ▸", () => runScene(enc, enc.sub[opt.goto], isRest));
         } else {
@@ -171,7 +177,64 @@ window.GAME = (function () {
       const notes = STATE.applyEffects(scene);
       UI.logNotes(notes);
       UI.renderSheet();
+      if (STATE.get().pendingPredicament) { enterPredicament(isRest, enc); return; }
       finishBeat(isRest, enc);
+    }
+  }
+
+  /* ---- PREDICAMENTS: what happens after a roll goes truly wrong -------- */
+  function enterPredicament(isRest, enc) {
+    const S = STATE.get();
+    const kind = S.pendingPredicament;
+    S.pendingPredicament = null;
+    S.predDays = 0;
+    const pred = DATA.predicaments[kind];
+    if (!pred) { finishBeat(isRest, enc); return; }
+    UI.log("═══ " + pred.title + " ═══", "header");
+    pendingContinue("Face it ▸", () => runPredicament(pred, "entry", isRest, enc));
+  }
+
+  function runPredicament(pred, key, isRest, enc) {
+    const S = STATE.get();
+    const scene = pred.scenes[key];
+    UI.setTitle(pred.title);
+    UI.setSub(DATA.locations[S.loc].name + (scene.sub ? " — " + scene.sub : ""));
+    UI.log(scene.text, "story");
+
+    const exit = (opt) => {
+      if (STATE.get().hp <= 0 || STATE.get().forceEnding) { finishBeat(isRest, enc); return; }
+      if (opt && opt.escape) {
+        if (opt.freeText) UI.log(opt.freeText, "good");
+        finishBeat(isRest, enc); return;
+      }
+      if (opt && opt.goto && pred.scenes[opt.goto]) {
+        pendingContinue("Continue ▸", () => runPredicament(pred, opt.goto, isRest, enc)); return;
+      }
+      // no explicit exit → another day, until the cap forces release
+      S.predDays = (S.predDays || 0) + 1;
+      if (S.predDays >= (pred.maxDays || 3)) {
+        pendingContinue("Continue ▸", () => runPredicament(pred, pred.forced || "entry", isRest, enc));
+      } else {
+        pendingContinue("Another day passes ▸", () => runPredicament(pred, "entry", isRest, enc));
+      }
+    };
+
+    if (scene.spin) {
+      const sp = buildSpin(scene.spin);
+      UI.setTitle(scene.spin.prompt || pred.title);
+      UI.setSub(oddsHint(sp.stat, sp.eff, sp.opts));
+      pendingSpin(sp.segs, sp.widx, (opt) => {
+        UI.log(opt.text, opt.valence === "good" ? "good" : opt.valence === "bad" ? "bad" : "story");
+        const notes = STATE.applyEffects(opt);
+        UI.logNotes(notes);
+        UI.renderSheet();
+        exit(opt);
+      });
+    } else {
+      const notes = STATE.applyEffects(scene);
+      UI.logNotes(notes);
+      UI.renderSheet();
+      exit(scene);
     }
   }
 

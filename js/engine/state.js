@@ -25,6 +25,8 @@ window.STATE = (function () {
       ended: null,
       pendingLoc: null,
       lastEnc: null,     // id of the previous encounter (no repeats back-to-back)
+      pendingPredicament: null, // a failed roll may drop you into a jail / capture
+      predDays: 0,
     };
     return S;
   }
@@ -115,6 +117,8 @@ window.STATE = (function () {
       notes.push({ t: "quest", v: eff.quest, old });
     }
     if (eff.loc) S.pendingLoc = eff.loc;
+    if (eff.predicament) { S.pendingPredicament = eff.predicament;
+      notes.push({ t: "predicament", v: eff.predicament }); }
     if (eff.ending) S.forceEnding = eff.ending;
     return notes;
   }
