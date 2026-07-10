@@ -112,6 +112,12 @@ Statuses begin with signature gear via `startItems:[…]` in `core.js`, so *who 
 
 **Destiny can turn.** Some encounters (and a few campfire dreams) carry a `quest:"revenge"`‑style key that **rewrites your purpose** mid‑journey — a glimpsed old enemy, a lord's war‑fan, a false arrest, a shrine's summons. Gates like `requiresQuest`, `requiresItem`, `requiresStatus`, `forbidFlag`, `once` and `minStep` let these land as turning‑points and chain into follow‑ons (e.g. *A Face from the Ash* → *The Reckoning*), each routing to its own ending. And an encounter never repeats **twice in a row** — a rest has to fall between.
 
+**Failure has teeth — predicaments.** When a roll goes truly wrong, a bad option can set `predicament:"jail"` (also `"ransom"`, `"conscript"`). The engine drops you into a self‑contained sequence in `js/data/predicaments.js` — the magistrate's cage, a bandit ransom camp, a warlord's press‑gang — each with **its own wheel** and its own ways out: bribe the jailer (spends your `Coin purse`), flash a `Seal of office`, slip the lock, plead before the magistrate, or serve your time and be turned loose the poorer. Predicament options use the ordinary effect keys plus `escape:true` (back to the road, with an optional `freeText`) and `goto` (jump to another scene here); every predicament is guaranteed to resolve — unresolved days loop up to `maxDays`, then a `forced` release fires. Wiring a new trigger is one key on any bad option:
+```js
+{ label:"Force the door", weight:7, valence:"bad",
+  text:"Wood splinters loud in the night. The watch drags you down.", hp:-6, predicament:"jail" }
+```
+
 **Add a status/tool** → `js/data/core.js` (remember: higher `rarity` = more common). **Add an ending** → `js/data/endings.js` with a `check(S)` and a `priority`.
 
 ---
