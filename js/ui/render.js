@@ -99,9 +99,11 @@ window.UI = (function () {
       const id = S.companions[i];
       if (id) {
         const c = DATA.companions[id];
-        slot.classList.add("filled", "trait-" + c.trait);
-        slot.textContent = initials(c.name);
-        slot.title = c.name + " — " + c.blurb + " (" + modText(c) + ")";
+        slot.classList.add("filled", "trait-" + c.trait, "art");
+        slot.innerHTML = ART.comp(id);
+        slot.setAttribute("aria-label", c.name);
+        slot.title = c.name;
+        slot.onclick = () => { sfx.click(); showCompanion(id); };
       }
       cg.appendChild(slot);
     }
@@ -112,9 +114,42 @@ window.UI = (function () {
     for (let i = 0; i < slots; i++) {
       const slot = document.createElement("div");
       slot.className = "slot";
-      if (items[i]) { slot.classList.add("filled", "item"); slot.textContent = "•"; slot.title = items[i]; }
+      const name = items[i];
+      if (name) {
+        slot.classList.add("filled", "item", "art");
+        slot.innerHTML = ART.item(name);
+        slot.title = name;
+        slot.onclick = () => { sfx.click(); showItem(name); };
+      }
       ig.appendChild(slot);
     }
+  }
+
+  /* ---- detail popups for a tapped item / companion -------------------- */
+  function showItem(name) {
+    const info = DATA.itemInfo(name);
+    const body =
+      `<div class="detail-head"><div class="detail-art">${ART.item(name)}</div>` +
+      `<div><h3 class="detail-name">${name}</h3>` +
+      `<p class="detail-desc">${info.desc}</p></div></div>` +
+      `<hr><p class="detail-benefit"><span class="detail-tag">Benefit</span> ${info.benefit}</p>`;
+    modal(name, body);
+  }
+  function showCompanion(id) {
+    const c = DATA.companions[id];
+    const traitName = c.trait.charAt(0).toUpperCase() + c.trait.slice(1);
+    const bonuses = [];
+    for (const k of ["str", "wis", "cha"]) if (c.mods && c.mods[k])
+      bonuses.push(`${{ str:"Strength", wis:"Wisdom", cha:"Charisma" }[k]} ${c.mods[k] > 0 ? "+" : ""}${c.mods[k]}`);
+    if (c.luck) bonuses.push(`Fortune ${c.luck > 0 ? "+" : ""}${c.luck}`);
+    const benefit = bonuses.length ? bonuses.join(" · ") : "Their company alone, and what it brings.";
+    const body =
+      `<div class="detail-head"><div class="detail-art">${ART.comp(id)}</div>` +
+      `<div><h3 class="detail-name">${c.name}</h3>` +
+      `<p class="detail-sub">${traitName}</p></div></div>` +
+      `<p class="detail-desc">${c.blurb}</p>` +
+      `<hr><p class="detail-benefit"><span class="detail-tag">Benefit</span> ${benefit}</p>`;
+    modal(c.name, body);
   }
   function initials(name) {
     const clean = name.replace(/[()]/g, "");
