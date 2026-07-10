@@ -62,6 +62,7 @@ window.UI = (function () {
       else if (n.t === "comp") { log(`✦ ${n.v} joins your journey.`, "gain"); }
       else if (n.t === "rmcomp") { log(`✦ ${n.v} parts from you.`, "loss"); }
       else if (n.t === "quest") { log(`✦ Your destiny turns — you now walk the road of ${questLabel(n.v)}.`, "quest"); sfx.good(); }
+      else if (n.t === "predicament") { const m = { jail:"You are seized and thrown in a cell.", ransom:"You are taken captive for ransom.", conscript:"You are pressed into a warlord's levy." }; log(`✦ ${m[n.v] || "Things take a turn for the worse."}`, "loss"); sfx.bad(); }
     }
   }
   function rebuildJournal() {
