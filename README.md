@@ -96,8 +96,19 @@ To add more, just append to the arrays — no engine changes needed.
 ```
 - `loc` matches a **location id** (`edo`) or **type** (`city/road/rural/wild/coast/sacred`) or `"any"`.
 - `circles` gates by station circle (or `"any"`).
-- Effect keys on any option/scene: `hp` `maxhp` `item` `comp` `rmComp` `flag` `rmFlag` `loc` `goto` `ending`.
+- Effect keys on any option/scene: `hp` `maxhp` `item` `consume` `comp` `rmComp` `flag` `rmFlag` `quest` `loc` `goto` `ending`.
 - A `goto` points at a key in the encounter's `sub:{}` map — that's how a cave‑in becomes several spins yet counts as **one** encounter.
+
+**Item‑swayed odds.** An option can react to what you carry:
+- `needItem:"Travel papers"` — the option only appears on the wheel if you hold that item (e.g. a monk's sealed papers open a safe path through the barrier‑gate).
+- `boostItem:"Sutra scroll"` (+ optional `boostAmt`) — carrying the item **fattens that slice**, raising the odds of that outcome.
+- `dampItem:"…"` (+ `dampAmt`) — shrinks a slice.
+- `consume:"Smoke bombs"` — spends one of that item when the option resolves.
+Statuses begin with signature gear via `startItems:[…]` in `core.js`, so *who you are* changes *what you can do*.
+
+**The wheel shows the true odds.** Wedge sizes are drawn **proportional to each option's real weight** (stat + companions + luck + carried items), so a fat slice genuinely is more likely. Labels always render upright, whatever the wheel's resting angle.
+
+**Destiny can turn.** Some encounters (and a few campfire dreams) carry a `quest:"revenge"`‑style key that **rewrites your purpose** mid‑journey — a glimpsed old enemy, a lord's war‑fan, a false arrest, a shrine's summons. Gates like `requiresQuest`, `requiresItem`, `requiresStatus`, `forbidFlag`, `once` and `minStep` let these land as turning‑points and chain into follow‑ons (e.g. *A Face from the Ash* → *The Reckoning*), each routing to its own ending. And an encounter never repeats **twice in a row** — a rest has to fall between.
 
 **Add a status/tool** → `js/data/core.js` (remember: higher `rarity` = more common). **Add an ending** → `js/data/endings.js` with a `check(S)` and a `priority`.
 
