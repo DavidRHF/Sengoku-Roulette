@@ -8,12 +8,17 @@ window.GAME = (function () {
 
   /* ---- spin / continue gating ----------------------------------------- */
   function pendingSpin(segments, winnerIndex, resolve) {
-    WHEEL.render(segments);
+    // order the wheel from the slimmest chance to the widest (clockwise from
+    // the pointer), so the odds read at a glance.
+    const winner = segments[winnerIndex];
+    const ordered = segments.slice().sort((a, b) => (a.weight || 1) - (b.weight || 1));
+    const widx = ordered.indexOf(winner);
+    WHEEL.render(ordered);
     UI.showAction();
     UI.setAction("◈ Spin the Wheel", () => {
       UI.setAction("Spinning…", () => {}, false);
       UI.sfx.spin();
-      WHEEL.spinTo(winnerIndex, () => resolve(segments[winnerIndex].item, winnerIndex));
+      WHEEL.spinTo(widx, () => resolve(ordered[widx].item, widx));
     });
   }
   function pendingContinue(label, fn) {
