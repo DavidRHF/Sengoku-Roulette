@@ -143,6 +143,7 @@ body{
 .entry-gain{color:var(--gold-soft);border-left-color:var(--gold);font-size:.82rem;}
 .entry-loss{color:var(--bad);border-left-color:var(--crimson);font-size:.82rem;}
 .entry-travel{color:var(--paper-dim);font-style:italic;border-left-color:var(--line);font-size:.82rem;}
+.entry-quest{color:var(--gold-soft);border-left-color:var(--crimson);font-weight:700;font-size:.9rem;}
 
 /* ---------------- modal ---------------- */
 .modal{position:fixed;inset:0;background:rgba(6,7,12,.78);display:none;align-items:center;
