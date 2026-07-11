@@ -52,6 +52,7 @@ window.GAME = (function () {
   function newGame() {
     STATE.fresh();
     document.getElementById("journal").innerHTML = "";
+    if (window.SCENE) SCENE.reset();
     UI.renderSheet();
     UI.log("戦国の輪 — Wheel of the Warring States", "header");
     UI.log("The realm is shattered into warring provinces. Before your road begins, the wheel decides who you are.", "story");
@@ -70,6 +71,7 @@ window.GAME = (function () {
       const S = STATE.get();
       if (S.inventory.length) UI.log(`You carry: ${S.inventory.join(", ")}.`, "gain");
       UI.renderSheet();
+      if (window.SCENE) SCENE.setCamp(S);
       pendingContinue("Take up your tools ▸", beginToolSpin);
     });
   }
@@ -86,6 +88,7 @@ window.GAME = (function () {
       UI.log(`In hand: ${tl.name}. ${tl.blurb}`, tierKind(tl.tier));
       UI.log(`You set out with ${S.hp} health, ${S.str} strength, ${S.wis} wisdom, ${S.cha} charisma.`, "gain");
       UI.renderSheet();
+      if (window.SCENE) SCENE.setCamp(S);
       pendingContinue("How does your road begin? ▸", beginStorySpin);
     });
   }
@@ -104,6 +107,7 @@ window.GAME = (function () {
       UI.log("Your road begins: " + intro.text, "story");
       S.phase = "journey";
       UI.renderSheet();
+      if (window.SCENE) SCENE.setMotif("setting_out", S);
       pendingContinue("Set out ▸", journeyTurn);
     });
   }
@@ -155,6 +159,7 @@ window.GAME = (function () {
     UI.setSub(DATA.locations[S.loc].name);
     UI.log("— " + enc.title + " —", "header");
     UI.log(scene.text, "story");
+    if (window.SCENE) { if (isRest) SCENE.setCamp(S); else SCENE.setEncounter(enc, S); }
 
     if (scene.spin) {
       const sp = buildSpin(scene.spin);
@@ -165,6 +170,9 @@ window.GAME = (function () {
         const notes = STATE.applyEffects(opt);
         UI.logNotes(notes);
         UI.renderSheet();
+        // a gained item / companion pulls the picture back to camp to reveal it
+        if (window.SCENE && !isRest && notes.some(n => n.t === "item" || n.t === "comp"))
+          SCENE.setCamp(STATE.get());
         if (STATE.get().hp <= 0 || STATE.get().forceEnding) { finishBeat(isRest, enc); return; }
         if (STATE.get().pendingPredicament) { enterPredicament(isRest, enc); return; }
         if (opt.goto && enc.sub && enc.sub[opt.goto]) {
@@ -177,6 +185,8 @@ window.GAME = (function () {
       const notes = STATE.applyEffects(scene);
       UI.logNotes(notes);
       UI.renderSheet();
+      if (window.SCENE && !isRest && notes.some(n => n.t === "item" || n.t === "comp"))
+        SCENE.setCamp(STATE.get());
       if (STATE.get().pendingPredicament) { enterPredicament(isRest, enc); return; }
       finishBeat(isRest, enc);
     }
@@ -190,6 +200,7 @@ window.GAME = (function () {
     S.predDays = 0;
     const pred = DATA.predicaments[kind];
     if (!pred) { finishBeat(isRest, enc); return; }
+    if (window.SCENE) SCENE.setMotif(kind, STATE.get());
     UI.log("═══ " + pred.title + " ═══", "header");
     pendingContinue("Face it ▸", () => runPredicament(pred, "entry", isRest, enc));
   }
@@ -308,6 +319,7 @@ window.GAME = (function () {
     const S = STATE.get();
     UI.rebuildJournal();
     UI.renderSheet();
+    if (window.SCENE) SCENE.setCamp(S);
     if (S.phase === "journey") {
       UI.setTitle("Your road continues.");
       UI.setSub("Step " + S.steps + " · " + DATA.locations[S.loc].name);
