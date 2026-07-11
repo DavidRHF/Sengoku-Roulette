@@ -34,7 +34,7 @@ window.SCENE = (function () {
     sea:"#2f5a6e", seaLt:"#3f7186", foam:"#cfe3ea",
     paddy:"#6f8f4a", pagoda:"#6b3f2a", pagodaRoof:"#3a3242",
     torii:"#b83227", lantern:"#d9b96a", moon:"#eef2f6", star:"#f2f5fb",
-    rain:"#9fb3c8", blade:"#c8ccd6", banner:"#efe6d2",
+    rain:"#9fb3c8", blade:"#c8ccd6", banner:"#efe6d2", jade:"#3f7d4e",
   };
   const W = 300, H = 210, HZ = 150, GY = 188;
 
@@ -105,6 +105,13 @@ window.SCENE = (function () {
       `<rect x="${-2*s}" y="${-9*s}" width="${4*s}" height="${9*s}" fill="${C.pineTrunk}"/>`+
       `<path d="M0 ${-h} L${w} ${-h*0.45} L${w*0.45} ${-h*0.45} L${w} ${-h*0.16} L${-w} ${-h*0.16} L${-w*0.45} ${-h*0.45} L${-w} ${-h*0.45} Z" fill="${C.pine}"/>`+
       `<path d="M0 ${-h} L${w*0.55} ${-h*0.5} L${-w*0.55} ${-h*0.5} Z" fill="${C.pineDk}" opacity="0.5"/></g>`; }
+  function horse(x, baseY, s, flip){ s=s||1; const f = flip?" scale(-1,1)":"";
+    return `<g transform="translate(${x},${baseY}) scale(${s})${f}">`+
+      `<ellipse cx="0" cy="0" rx="20" ry="3" fill="#000" opacity="0.25"/>`+
+      `<path d="M-22 -18 Q-24 -30 -16 -32 L-12 -26 Q-6 -30 0 -26 Q10 -26 18 -16 L18 -2 L13 -2 L11 -12 Q4 -8 -4 -10 L-4 -2 L-9 -2 L-9 -12 Q-16 -12 -18 -18 Z" fill="${C.wood}" stroke="${C.wood2}" stroke-width="1"/>`+
+      `<path d="M-16 -32 l-4 -6 3 1 2 4z" fill="${C.wood2}"/>`+
+      `<path d="M-20 -20 q-6 4 -8 12 q4 -4 9 -8z" fill="${C.pineDk}" opacity="0.7"/>`+
+      `<circle cx="-17" cy="-27" r="1.1" fill="${C.ink}"/></g>`; }
   function torii(x, baseY, s){ s=s||1; const w=30*s, h=34*s;
     return `<g transform="translate(${x},${baseY})" fill="${C.torii}">`+
       `<rect x="${-w/2-3}" y="${-h}" width="${w+6}" height="4"/>`+
@@ -116,6 +123,17 @@ window.SCENE = (function () {
       `<rect x="-4" y="-20" width="8" height="12" rx="1.5" fill="${C.lantern}" stroke="${C.wood2}" stroke-width="1"/>`+
       `<rect x="-6" y="-22" width="12" height="3" fill="${C.wood2}"/>`+
       `<rect x="-2" y="-8" width="4" height="8" fill="${C.wood2}"/></g>`; }
+  // an animated campfire: pulsing glow + flickering flame
+  function firePit(x, y, s){ s=s||1;
+    return `<g transform="translate(${x},${y}) scale(${s})">`+
+      `<ellipse cx="0" cy="2" rx="20" ry="10" fill="url(#scGlow)">`+
+        `<animate attributeName="opacity" values="0.65;1;0.7;0.95;0.65" dur="1.7s" repeatCount="indefinite"/></ellipse>`+
+      `<rect x="-10" y="0" width="20" height="3.4" rx="1.4" fill="${C.wood}" transform="rotate(12)"/>`+
+      `<rect x="-10" y="0" width="20" height="3.4" rx="1.4" fill="${C.wood2}" transform="rotate(-16)"/>`+
+      `<g>`+
+        `<animateTransform attributeName="transform" type="scale" additive="sum" values="1 1;1.05 1.18;0.96 0.9;1.04 1.12;1 1" dur="0.7s" repeatCount="indefinite"/>`+
+        `<path d="M0 -3 Q-7 -10 -2 -17 Q2 -11 4 -16 Q9 -7 3 0 Z" fill="${C.flame}"/>`+
+        `<path d="M0 -4 Q-3 -9 0 -14 Q2 -10 2 -13 Q5 -7 1 -1 Z" fill="${C.flame2}"/></g></g>`; }
   function pagoda(x, baseY, s){ s=s||1; const u=(a,b,w,h)=>`<rect x="${a}" y="${b}" width="${w}" height="${h}" fill="${C.pagoda}"/>`;
     const roof=(y,w)=>`<path d="M${-w} ${y} Q0 ${y-7} ${w} ${y} L${w*0.7} ${y+2} Q0 ${y-3} ${-w*0.7} ${y+2} Z" fill="${C.pagodaRoof}"/>`;
     return `<g transform="translate(${x},${baseY}) scale(${s})">`+u(-8,-40,16,40)+roof(-40,18)+roof(-28,15)+roof(-16,12)+`</g>`; }
@@ -136,11 +154,13 @@ window.SCENE = (function () {
     return s;
   }
   function weatherFx(weather){
-    if(weather==="rain"){ let s=`<g stroke="${C.rain}" stroke-width="1" opacity="0.5">`;
-      for(let i=0;i<40;i++){ const x=rnd(i)*W, y=rnd(i+5)*H; s+=`<line x1="${x.toFixed(0)}" y1="${y.toFixed(0)}" x2="${(x-4).toFixed(0)}" y2="${(y+10).toFixed(0)}"/>`; }
+    if(weather==="rain"){ let s=`<g stroke="${C.rain}" stroke-width="1" opacity="0.5">`+
+        `<animateTransform attributeName="transform" type="translate" values="0 -12;0 12" dur="0.45s" repeatCount="indefinite"/>`;
+      for(let i=0;i<44;i++){ const x=rnd(i)*W, y=rnd(i+5)*(H+24)-12; s+=`<line x1="${x.toFixed(0)}" y1="${y.toFixed(0)}" x2="${(x-4).toFixed(0)}" y2="${(y+11).toFixed(0)}"/>`; }
       return s+`</g>`; }
-    if(weather==="snow"){ let s=`<g fill="${C.paper}" opacity="0.85">`;
-      for(let i=0;i<34;i++){ const x=rnd(i)*W, y=rnd(i+3)*H; s+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${(rnd(i)*1+0.6).toFixed(1)}"/>`; }
+    if(weather==="snow"){ let s=`<g fill="${C.paper}" opacity="0.85">`+
+        `<animateTransform attributeName="transform" type="translate" values="0 -14;2 14" dur="3.2s" repeatCount="indefinite"/>`;
+      for(let i=0;i<36;i++){ const x=rnd(i)*W, y=rnd(i+3)*(H+28)-14; s+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${(rnd(i)*1+0.6).toFixed(1)}"/>`; }
       return s+`</g>`; }
     return "";
   }
@@ -340,6 +360,78 @@ window.SCENE = (function () {
     mystic:(x)=> `<g opacity="0.5" fill="none" stroke="${C.goldSoft}" stroke-width="1.4"><circle cx="200" cy="96" r="18"/><circle cx="200" cy="96" r="10"/></g>`+
       person(150,GY,0.95,{robe:C.robeRelig,hat:"hood",injury:0})+
       person(96,GY,1.15,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:x.inj}),
+    // ---- bespoke marquee & new-station motifs ------------------------
+    tea:(x)=> `<rect x="60" y="98" width="180" height="5" fill="${C.wood2}"/>`+
+      `<rect x="138" y="66" width="22" height="34" fill="${C.paper}" opacity="0.85" stroke="${C.wood2}" stroke-width="0.6"/>`+
+      `<path d="M144 74 q5 6 10 0" stroke="${C.crimson}" stroke-width="1" fill="none"/>`+
+      person(96,GY,1.05,{robe:C.robeWarrior,hat:"none",injury:0,pose:"sit",flip:true})+
+      person(204,GY,1.05,{robe:C.robeNoble,hat:"none",injury:0,pose:"sit"})+
+      person(150,GY,1.1,{robe:robeFor(x.S),hat:"none",injury:x.inj,pose:"bow"})+
+      `<circle cx="150" cy="176" r="4" fill="${C.jade}"/><circle cx="150" cy="175" r="2" fill="${C.paper}"/>`,
+    sumo:(x)=> `<ellipse cx="150" cy="178" rx="74" ry="18" fill="#d9c49a" stroke="#b09666" stroke-width="1.4"/>`+
+      `<ellipse cx="150" cy="178" rx="58" ry="12" fill="none" stroke="#b09666" stroke-width="1"/>`+
+      person(124,178,1.35,{robe:C.robeLow,hat:"none",injury:0,pose:"fight"})+
+      person(176,178,1.35,{robe:C.robeCrim,hat:"none",injury:x.inj,pose:"fight",flip:true}),
+    cavalry:(x)=> horse(214,GY,1.25,true)+ person(214,GY-30,1.0,{robe:C.robeWarrior,hat:"helmet",tool:"spear",injury:0,flip:true})+
+      person(92,GY,1.2,{robe:robeFor(x.S),hat:"kasa",tool:x.tool||"katana",injury:x.inj,pose:"fight"}),
+    plague:(x)=> `<rect x="118" y="96" width="64" height="8" fill="${C.wood2}"/>`+
+      `<line x1="122" y1="104" x2="122" y2="150" stroke="${C.wood}" stroke-width="4"/><line x1="178" y1="104" x2="178" y2="150" stroke="${C.wood}" stroke-width="4"/>`+
+      `<path d="M122 100 h56" stroke="${C.paper}" stroke-width="3"/>`+
+      `<path d="M130 100 v6 M142 100 v6 M154 100 v6 M166 100 v6" stroke="${C.paper}" stroke-width="1.4"/>`+
+      person(196,GY,1.0,{robe:C.robeLow,injury:0,pose:"fallen"})+
+      person(120,GY,1.15,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:x.inj,pose:"bow"}),
+    harbor:(x)=> `<rect x="0" y="${HZ}" width="${W}" height="${H-HZ}" fill="${C.sea}"/>`+
+      `<g fill="none" stroke="${C.foam}" stroke-width="1" opacity="0.5">`+
+      Array.from({length:4},(_,r)=>Array.from({length:11},(_,i)=>`<path d="M${i*30-10} ${HZ+10+r*11} q10 -6 20 0"/>`).join("")).join("")+`</g>`+
+      `<g transform="translate(196,168) rotate(-8)"><path d="M-40 0 Q0 20 40 0 L30 10 Q0 18 -30 10 Z" fill="${C.wood2}"/>`+
+      `<rect x="-1" y="-40" width="3" height="40" fill="${C.wood}"/><path d="M2 -38 L22 -12 L2 -12 Z" fill="${C.paper}" opacity="0.85"/>`+
+      `<rect x="-18" y="-6" width="10" height="7" fill="${C.tent}"/></g>`+
+      person(84,180,1.1,{robe:robeFor(x.S),hat:"kasa",tool:x.tool||"katana",injury:x.inj}),
+    biwa:(x)=> person(112,GY,1.15,{robe:robeFor(x.S),hat:"none",injury:x.inj,pose:"sit"})+
+      `<path d="M118 ${GY-18} q10 -2 8 -14" stroke="${C.wood2}" stroke-width="2" fill="none"/>`+
+      `<path d="M122 ${GY-30} a5 8 0 1 0 0.1 0z" fill="${C.wood}"/>`+
+      person(190,GY,1.0,{robe:C.robeWarrior,hat:"helmet",injury:0,flip:true})+
+      person(216,GY,1.0,{robe:C.robeWarrior,hat:"helmet",injury:0,flip:true}),
+    reckoning:(x)=> `<rect x="0" y="0" width="${W}" height="${H}" fill="#0a0e1c" opacity="0.42"/>`+ weatherFx("rain")+
+      lantern(52,GY,1.1)+ `<rect x="40" y="${HZ}" width="${W-80}" height="3" fill="${C.groundDk}"/>`+
+      person(108,GY,1.3,{robe:robeFor(x.S),hat:"none",tool:x.tool||"katana",injury:x.inj,pose:"fight"})+
+      person(206,GY,1.3,{robe:"#3a2f42",hat:"none",tool:"katana",injury:0,pose:"fight",flip:true}),
+    nanban:(x)=> `<rect x="0" y="${HZ}" width="${W}" height="${H-HZ}" fill="${C.sea}"/>`+
+      `<g transform="translate(210,150)"><path d="M-46 20 Q0 34 46 20 L36 30 Q0 38 -36 30 Z" fill="#4a3526"/>`+
+      `<rect x="-30" y="-46" width="3" height="66" fill="${C.wood}"/><rect x="10" y="-40" width="3" height="60" fill="${C.wood}"/>`+
+      `<rect x="-44" y="-40" width="30" height="24" fill="${C.paper}" opacity="0.9"/><rect x="-4" y="-34" width="28" height="22" fill="${C.paper}" opacity="0.9"/>`+
+      `<path d="M-30 -46 l0 -6 8 3z" fill="${C.crimson}"/></g>`+
+      person(70,GY,1.1,{robe:"#6b3f2a",hat:"none",tool:"gun",injury:0})+
+      person(112,GY,1.15,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:x.inj}),
+    war_council:(x)=> `<rect x="150" y="64" width="150" height="7" fill="${C.crimson}"/>`+
+      banner(160,GY,1.05)+banner(286,GY,0.95)+
+      `<path d="M196 ${GY} L236 ${GY} L232 ${GY-30} L200 ${GY-30} Z" fill="${C.robeNoble}" stroke="${C.ink}" stroke-width="0.8"/>`+
+      `<circle cx="216" cy="${GY-36} " r="5" fill="${C.skin}"/>`+
+      `<path d="M232 ${GY-24} l14 -8" stroke="${C.gold}" stroke-width="2"/><rect x="244" y="${GY-36}" width="10" height="8" rx="2" fill="${C.ink}" stroke="${C.gold}" stroke-width="1"/>`+
+      person(120,GY,1.15,{robe:robeFor(x.S),hat:"none",injury:x.inj,pose:"bow"}),
+    vision:(x)=> `<g opacity="0.6" fill="none" stroke="${C.goldSoft}" stroke-width="1.6"><circle cx="188" cy="86" r="24"><animate attributeName="r" values="20;26;20" dur="3s" repeatCount="indefinite"/></circle><circle cx="188" cy="86" r="13"/></g>`+
+      `<circle cx="188" cy="86" r="6" fill="${C.gold}" opacity="0.7"/>`+
+      lantern(120,GY,1)+`<path d="M150 ${GY} q4 -20 0 -34" stroke="${C.paper}" stroke-width="1" opacity="0.4" fill="none"/>`+
+      person(150,GY,1.15,{robe:robeFor(x.S),hat:"hood",injury:x.inj,pose:"bow"}),
+    cave:(x)=> `<path d="M150 ${HZ} q-70 0 -80 ${H-HZ} L${W} ${H} L${W} ${HZ} Z" fill="#3a3242"/>`+
+      `<path d="M150 ${GY} q-40 -60 -8 -78 q40 6 40 78 z" fill="#0c0d15"/>`+
+      person(96,GY,1.15,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:x.inj})+
+      `<circle cx="112" cy="${GY-26}" r="5" fill="url(#scGlow)"/><path d="M110 ${GY-22} l3 -6" stroke="${C.flame2}" stroke-width="2"/>`,
+    execution:(x)=> `<rect x="0" y="0" width="${W}" height="${H}" fill="#100c10" opacity="0.28"/>`+
+      `<rect x="146" y="112" width="6" height="40" fill="${C.wood2}"/><rect x="132" y="112" width="34" height="5" fill="${C.wood2}"/>`+
+      person(150,GY,1.15,{robe:robeFor(x.S),hat:"none",injury:Math.max(1,x.inj),pose:"bow"})+
+      person(96,GY,1.05,{robe:C.robeWarrior,hat:"helmet",tool:"spear",injury:0})+
+      person(210,GY,1.05,{robe:C.robeWarrior,hat:"helmet",tool:"spear",injury:0,flip:true}),
+    fire:(x)=> `<g transform="translate(206,${GY})"><path d="M-34 0 L-34 -34 L0 -46 L34 -34 L34 0 Z" fill="${C.tentDoor}"/>`+
+      `<g><animateTransform attributeName="transform" type="scale" additive="sum" values="1 1;1.06 1.2;0.95 0.92;1 1" dur="0.6s" repeatCount="indefinite"/>`+
+      `<path d="M-20 -20 Q-30 -40 -14 -52 Q-12 -40 -4 -48 Q-2 -34 -12 -20 Z" fill="${C.flame}"/>`+
+      `<path d="M8 -18 Q0 -38 16 -50 Q16 -36 24 -46 Q26 -30 16 -18 Z" fill="${C.flame2}"/></g>`+
+      `<ellipse cx="0" cy="-24" rx="40" ry="26" fill="url(#scGlow)"><animate attributeName="opacity" values="0.5;0.9;0.6" dur="1.3s" repeatCount="indefinite"/></ellipse></g>`+
+      person(88,GY,1.15,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:x.inj}),
+    storm:(x)=> weatherFx("rain")+
+      `<path d="M60 60 l-8 30 8 -6 -6 26" stroke="${C.goldSoft}" stroke-width="2" fill="none" opacity="0.8"/>`+
+      `<path d="M28 ${HZ+4} q-6 -20 -18 -28 q14 2 22 12" fill="${C.pineDk}"/>`+
+      person(140,GY,1.15,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:x.inj,pose:"bow"}),
     // predicaments
     jail:(x)=> person(150,GY,1.2,{robe:robeFor(x.S),hat:"none",injury:Math.max(1,x.inj)})+ bars(),
     ransom:(x)=> campBase(false)+ person(150,GY,1.15,{robe:robeFor(x.S),hat:"none",injury:Math.max(1,x.inj),pose:"bow"})+
@@ -358,12 +450,8 @@ window.SCENE = (function () {
     s += `<path d="M198 ${GY} L224 ${GY-42} L250 ${GY} Z" fill="${C.tent}" stroke="${C.tentDk}" stroke-width="1.4"/>`+
       `<path d="M224 ${GY-42} L250 ${GY} L236 ${GY} Z" fill="${C.tentDk}" opacity="0.35"/>`+
       `<path d="M214 ${GY} L224 ${GY-26} L234 ${GY} Z" fill="${C.tentDoor}"/>`;
-    // campfire
-    s += `<g transform="translate(150,${GY})"><ellipse cx="0" cy="2" rx="20" ry="10" fill="url(#scGlow)"/>`+
-      `<rect x="-10" y="0" width="20" height="3.4" rx="1.4" fill="${C.wood}" transform="rotate(12)"/>`+
-      `<rect x="-10" y="0" width="20" height="3.4" rx="1.4" fill="${C.wood2}" transform="rotate(-16)"/>`+
-      `<path d="M0 -3 Q-7 -10 -2 -17 Q2 -11 4 -16 Q9 -7 3 0 Z" fill="${C.flame}"/>`+
-      `<path d="M0 -4 Q-3 -9 0 -14 Q2 -10 2 -13 Q5 -7 1 -1 Z" fill="${C.flame2}"/></g>`;
+    // campfire (animated)
+    s += firePit(150, GY, 1.0);
     return s;
   }
   function camp(ctx){
@@ -412,6 +500,11 @@ window.SCENE = (function () {
     court:"御前　The Court", river:"渡し　The Ford", coast:"海辺　The Coast", beast:"獣　Beast",
     gamble:"賭場　Gambling", gate:"関所　Barrier Gate", festival:"祭　Festival",
     poison:"密約　Dark Bargain", wounded:"行き倒れ　The Fallen", mystic:"予兆　An Omen",
+    tea:"茶の湯　The Tea Room", sumo:"相撲　The Bout", cavalry:"騎馬　Horsemen",
+    plague:"疫病　The Fever Road", harbor:"湊　The Harbor", biwa:"平曲　The Minstrel",
+    reckoning:"仇討ち　The Reckoning", nanban:"南蛮船　The Foreign Ship",
+    war_council:"軍議　War Council", vision:"神託　The Summons", cave:"洞　The Cavern",
+    execution:"仕置き　The Sentence", fire:"火事　Fire", storm:"嵐　The Storm",
     jail:"牢　The Cage", ransom:"人質　Held for Ransom", conscript:"徴募　The Levy",
   };
 
@@ -420,6 +513,20 @@ window.SCENE = (function () {
     if(enc && enc.art) return enc.art;
     const hay = ((enc&&enc.id||"")+" "+(enc&&enc.title||"")+" "+((enc&&enc.scene&&enc.scene.text)||"")).toLowerCase();
     const m = [
+      [/tea[ -]?room|tea[ -]?ceremony|chaj|whisk|bowl of froth/,"tea"],
+      [/sumo|rikishi|wrestl|dohyo|the ring/,"sumo"],
+      [/horse|cavalr|rider|lance|saddle|mounted/,"cavalry"],
+      [/plague|fever|sick village|pox|pestilence|physician/,"plague"],
+      [/harbor|harbour|junk|wreck|tide|grounded/,"harbor"],
+      [/biwa|minstrel|lute|lament|the fallen \(house/,"biwa"],
+      [/reckoning|vendetta|old enemy|vengeance/,"reckoning"],
+      [/nanban|matchlock|portug|foreign ship|teppo/,"nanban"],
+      [/war[ -]?council|envoy|war[ -]?fan|the lord asks|his master gathers/,"war_council"],
+      [/vision|summons in the smoke|omen at|prophe/,"vision"],
+      [/cavern|cave|ravine|tunnel|passage under/,"cave"],
+      [/execution|sentence|magistrate|branded|false charge|gallows/,"execution"],
+      [/on fire|burning|conflagration|the city burns/,"fire"],
+      [/storm|blizzard|typhoon|downpour|thunder/,"storm"],
       [/bandit|brigand|nobushi|robber|ambush|thief|thieves/,"bandits"],
       [/duel|reckoning|vendetta|old enemy|challenge|rival|swords? cross/,"duel"],
       [/ghost|spirit|onry|haunt|restless|drowned|crows/,"ghost"],
