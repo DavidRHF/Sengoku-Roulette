@@ -73,7 +73,7 @@ DATA.encounters = [
           { label:"Chase it off", weight:6, valence:"bad", text:"You throw a stone. Bad idea. That night your food spoils and your sandals go missing.", hp:-4 },
         ] } } },
 
-  { id:"storm", title:"Sudden Storm", loc:["road","wild","mountain","farm","any"], circles:["any"], weight:7,
+  { id:"storm", art:"river", title:"Sudden Storm", loc:["road","wild","mountain","farm","any"], circles:["any"], weight:7,
     scene:{ text:"The sky goes bruise-purple and opens. Rain hammers the road to mud; thunder walks the ridgeline.",
       spin:{ prompt:"Where do you shelter?", stat:"wis",
         options:[
@@ -83,7 +83,7 @@ DATA.encounters = [
           { label:"Dig in and wait", weight:7, valence:"neutral", text:"You wrap in your cloak and endure. Dawn comes cold but whole.", hp:-2 },
         ] } } },
 
-  { id:"beggar_child", title:"The Hungry Child", loc:["road","city","outskirts","any"], circles:["any"], weight:6,
+  { id:"beggar_child", art:"wounded", title:"The Hungry Child", loc:["road","city","outskirts","any"], circles:["any"], weight:6,
     scene:{ text:"A ragged child tugs your sleeve, eyes huge with hunger. Behind them, no parents — only the war's long shadow.",
       spin:{ prompt:"How do you respond?", stat:"cha",
         options:[
@@ -151,7 +151,7 @@ DATA.encounters = [
           { label:"Browse only", weight:7, valence:"neutral", text:"You window-shop the world's goods and leave with your coin intact.", hp:0 },
         ] } } },
 
-  { id:"cityfire", title:"Flowers of Edo", loc:["edo","city"], circles:["any"], weight:6,
+  { id:"cityfire", art:"battlefield", title:"Flowers of Edo", loc:["edo","city"], circles:["any"], weight:6,
     scene:{ text:"'Fire! Fire!' The cry runs the wooden streets — the flames the city grimly calls its 'flowers.' A child screams from an upper window.",
       spin:{ prompt:"The fire spreads fast.", stat:"str",
         options:[
@@ -169,7 +169,7 @@ DATA.encounters = [
           { label:"Overstep", weight:8, valence:"bad", text:"You misjudge the etiquette. He is offended; you are shown out coldly, and watched thereafter.", flag:"marked" },
         ] } } },
 
-  { id:"assassin", title:"A Blade in the Crowd", loc:["city","edo","kyoto"], circles:["noble","warrior","criminal"], weight:5,
+  { id:"assassin", art:"poison", title:"A Blade in the Crowd", loc:["city","edo","kyoto"], circles:["noble","warrior","criminal"], weight:5,
     scene:{ text:"In the market crush, you feel the wrongness a heartbeat before the knife — someone means you dead, here, now.",
       spin:{ prompt:"React.", stat:"wis",
         options:[
@@ -362,7 +362,7 @@ DATA.encounters = [
           { label:"Take the poison for leverage", weight:6, valence:"good", text:"You palm the evidence. A vial of proof is a key that opens many doors — and a few graves.", item:"Vial of poison", flag:"leverage" },
         ] } } },
 
-  { id:"battlefield", title:"The Field After Battle", loc:["road","rural","wild","farm","outskirts"], circles:["any"], weight:6,
+  { id:"battlefield", art:"battlefield", title:"The Field After Battle", loc:["road","rural","wild","farm","outskirts"], circles:["any"], weight:6,
     scene:{ text:"You crest a rise into a field of the freshly slain — banners trampled, crows already at work. The armies have moved on, leaving this.",
       spin:{ prompt:"Cross the killing-field.", stat:"wis",
         options:[
@@ -379,7 +379,7 @@ DATA.encounters = [
    *  (`consume`). Carrying the right thing visibly bends the wheel.
    * ===================================================================== */
 
-  { id:"wandering_preacher", title:"The Roadside Sermon", loc:["road","rural","outskirts","shrine","any"], circles:["religious","any"], weight:6,
+  { id:"wandering_preacher", art:"monk", title:"The Roadside Sermon", loc:["road","rural","outskirts","shrine","any"], circles:["religious","any"], weight:6,
     scene:{ text:"A crowd has gathered at a crossroads where a rival preacher damns your sect to a nodding, dangerous mob. They turn to see what you will say.",
       spin:{ prompt:"Answer the preacher.", stat:"wis",
         options:[
@@ -409,7 +409,7 @@ DATA.encounters = [
           { label:"Force the door", weight:7, valence:"bad", text:"Wood splinters loud in the night. Torches bloom, spears level, and the district watch drags you down.", hp:-6, predicament:"jail" },
         ] } } },
 
-  { id:"drinking_contest", title:"The Drinking Contest", loc:["city","edo","kyoto","rural","farm","any"], circles:["low","entertainer","criminal","any"], weight:6,
+  { id:"drinking_contest", art:"gamble", title:"The Drinking Contest", loc:["city","edo","kyoto","rural","farm","any"], circles:["low","entertainer","criminal","any"], weight:6,
     scene:{ text:"A red-faced ronin slams down his cup and challenges the room. Wagers pile up. The crowd chants for a champion.",
       spin:{ prompt:"Do you take the challenge?", stat:"cha",
         options:[
@@ -428,7 +428,7 @@ DATA.encounters = [
           { label:"Refuse the job", weight:6, valence:"neutral", text:"You will not put your mark on a doomed rush-job. He scowls and takes his steel elsewhere.", hp:0 },
         ] } } },
 
-  { id:"court_poetry", title:"The Poetry Contest", loc:["kyoto","city","shrine"], circles:["noble","entertainer","religious"], weight:5,
+  { id:"court_poetry", art:"festival", title:"The Poetry Contest", loc:["kyoto","city","shrine"], circles:["noble","entertainer","religious"], weight:5,
     scene:{ text:"At a moonviewing, the assembled court trades linked verse. A sharp-eyed lady sets you a topic and waits, fan half-raised, to be impressed or amused.",
       spin:{ prompt:"Offer your verse.", stat:"cha",
         options:[
@@ -438,7 +438,7 @@ DATA.encounters = [
           { label:"Stammer and fail", weight:6, valence:"bad", text:"The words desert you. Behind polite fans, the court files you away as provincial.", flag:"marked" },
         ] } } },
 
-  { id:"poison_offer", title:"The Quiet Commission", loc:["city","edo","kyoto"], circles:["criminal","warrior","wanderer"], weight:5, minStep:2,
+  { id:"poison_offer", art:"poison", title:"The Quiet Commission", loc:["city","edo","kyoto"], circles:["criminal","warrior","wanderer"], weight:5, minStep:2,
     scene:{ text:"A veiled go-between slides a folded paper across the table. 'A name, a price, and a season to do it in. My masters value discretion — and reward it.'",
       spin:{ prompt:"Consider the dark contract.", stat:"wis",
         options:[
@@ -454,7 +454,7 @@ DATA.encounters = [
    *  and by `minStep` so they land like turning-points, not noise.
    * ===================================================================== */
 
-  { id:"old_enemy", title:"A Face from the Ash", loc:["any"], circles:["any"], weight:5, once:true, minStep:3,
+  { id:"old_enemy", art:"duel", title:"A Face from the Ash", loc:["any"], circles:["any"], weight:5, once:true, minStep:3,
     scene:{ text:"Across a crowded ford-town you see him: the man whose order burned your old life to the ground. He has not seen you. Yet.",
       spin:{ prompt:"What rises in you?", stat:"wis",
         options:[
@@ -545,7 +545,7 @@ DATA.encounters = [
           { label:"Dragged down by numbers", weight:9, valence:"bad", text:"There are simply too many. A club finds your temple, and the world goes dark. You wake bound.", predicament:"ransom" },
         ] } } },
 
-  { id:"press_gang", title:"The Recruiters", loc:["road","tokaido","rural","farm","outskirts","city"], circles:["low","peasant","warrior","wanderer","any"], weight:6, minStep:3, forbidFlag:"sworn_service",
+  { id:"press_gang", art:"gate", title:"The Recruiters", loc:["road","tokaido","rural","farm","outskirts","city"], circles:["low","peasant","warrior","wanderer","any"], weight:6, minStep:3, forbidFlag:"sworn_service",
     scene:{ text:"A muster-sergeant with a squad at his back blocks the road, eyeing your legs and arms like a farmer eyeing an ox. 'Strong one. His lordship needs spears.'",
       spin:{ prompt:"Avoid the muster?", stat:"cha",
         options:[
