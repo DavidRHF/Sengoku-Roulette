@@ -58,7 +58,7 @@ sengoku-wheel/
 │   └── styles.css        # full aesthetic (ink ground, seigaiha, gold wheel)
 └── js/
     ├── data/             # ← all content lives here (plain data, easy to expand)
-    │   ├── core.js       #   20 statuses · 15 tools · companions · locations
+    │   ├── core.js       #   30 statuses · 25 tools · companions · locations
     │   ├── story.js      #   beginning story paths (circle‑tagged)
     │   ├── encounters.js #   road events (some multi‑spin branches)
     │   ├── rests.js      #   night events per location type
@@ -80,7 +80,7 @@ Everything is attached to plain globals (`DATA`, `RNG`, `STATE`, `WHEEL`, `UI`, 
 
 The engine is **data‑driven**: because content is shared across *circles* and *locations* and filtered per playthrough, the variety you actually experience is large, and each station is guaranteed **≥10 eligible openings** in code. The starter content set ships with:
 
-- **20** statuses, **15** tools, **13** companions, **10** locations
+- **30** statuses, **25** tools, **13** companions, **10** locations
 - **40+** beginning story paths, **30+** encounters (several branching), **20+** rest events, **18** endings
 
 To add more, just append to the arrays — no engine changes needed.
@@ -111,10 +111,11 @@ Statuses begin with signature gear via `startItems:[…]` in `core.js`, so *who 
 **Illustrated gear, tap for detail.** Every item and companion has its own bundled SVG picture (original CC0 art in `js/data/art.js` — no external images, so it works offline and on Pages with zero network). Tap any item or companion tile in the sidebar to open a card with its description and its concrete **benefit** (what it does mechanically, or the stat/luck bonus a companion brings). Item text and effects live in `js/data/items.js` (`DATA.itemInfo`), keyed by name with sensible category fallbacks so anything picked up on the road still gets a proper card.
 
 **The journey scene.** A composed woodblock-style print fills a large gold-lacquer panel at the left (`js/ui/scene.js`), and it paints a picture for **every spin**, not just camps:
-- **A motif for each encounter.** Bandits are drawn mid-fight, a shrine gets its torii and stone lanterns, an onryō looms pale over the road, a market has its stalls, a river its ford-stones, a lord's court its curtains and banner, plus duels, beasts, gambling mats, barrier-gates, festivals, dark bargains, the fallen, omens — and the three predicaments (jail bars, a bound ransom captive, a press-gang of spears). The motif is `enc.art` if set, otherwise inferred from the text by a keyword classifier, so every one of the 50-plus encounters shows something fitting.
+- **A motif for each encounter.** Bandits are drawn mid-fight, a shrine gets its torii and stone lanterns, an onryō looms pale over the road, a market has its stalls, a river its ford-stones, a lord's court its curtains and banner, plus duels, beasts, gambling mats, barrier-gates, festivals, dark bargains, the fallen, omens — and the three predicaments (jail bars, a bound ransom captive, a press-gang of spears). Marquee encounters get **bespoke** scenes — the rain-dark courtyard of *The Reckoning*, a Portuguese carrack for the *Nanban* trade, a grand *war council* under banners, a tea-room truce, a sumo bout, a cavalry charge, a plague-gate, a grounded junk on the tide-flats, a blind minstrel before soldiers. The motif is `enc.art` if set, otherwise inferred from the text by a keyword classifier, so all 58 encounters show something fitting (35 distinct motifs in all).
 - **Backdrops vary** by biome (city pagodas, paddy fields, forest pines, mountain Fuji, the sea coast, shrine torii, open road), by **time of day** (dawn · day · dusk · night with a moon and stars), and by **weather** (clear · rain · snow).
 - **Camps** (rests and creation) show fire, tent, pines and a drying-rack hung with your items, companions gathered by the fire, and the traveller holding **their actual tool**. If you bear rank or a crest, a **clan banner** flies and a mon marks the tent.
 - **Injury is cumulative.** The lowest health you've ever reached leaves scars that never fade — a bandage, then a wound, then a hunched limp — visible on the traveller in every scene.
+- **It moves.** The campfire flickers and its glow pulses, and rain and snow actually fall — lightweight inline SVG animation, still fully offline.
 
 It repaints from true game state (`SCENE.sync`), all vector and offline in one flat palette. (Sound has been removed entirely.)
 
