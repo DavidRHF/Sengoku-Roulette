@@ -300,6 +300,45 @@ window.SCENE = (function () {
       `<path d="M1 -22 L14 -8 L1 -8 Z" fill="${C.paper}" opacity="0.85"/></g>`; }
   function crow(x,y){ return `<path d="M${x} ${y} q4 -3 8 0 q-4 1 -4 4 q0 -3 -4 -4z" fill="#111"/>`; }
 
+  /* ---- extra props used by the bespoke ending scenes ------------------ */
+  function bigMoon(cx,cy,r,fill){ return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill||C.moon}"/>`; }
+  function ensoRing(cx,cy,r){ return `<path d="M${cx-r*0.7} ${cy-r*0.7} A ${r} ${r} 0 1 1 ${cx-r*0.9} ${cy+r*0.4}" `+
+      `fill="none" stroke="${C.gold}" stroke-width="4" stroke-linecap="round" opacity="0.8"/>`; }
+  function crowd(cx, baseY, n){ let s=""; for(let i=0;i<n;i++){ const x=cx+(i-(n-1)/2)*15+ (rnd(i)*4-2);
+      const rob=[C.robeLow,C.robeMerch,C.robeRelig,C.robeCrim][i%4];
+      s+=`<g transform="translate(${x.toFixed(0)},${baseY})"><path d="M-6 0 L6 0 L4 -14 L-4 -14 Z" fill="${rob}"/>`+
+         `<circle cx="0" cy="-17" r="3.4" fill="${C.skin}"/></g>`; } return s; }
+  function castle(x, baseY, s){ s=s||1; const roof=(y,w)=>`<path d="M${-w} ${y} Q0 ${y-7} ${w} ${y} L${w-4} ${y+3} L${-w+4} ${y+3} Z" fill="${C.pagodaRoof}"/>`;
+    return `<g transform="translate(${x},${baseY}) scale(${s})">`+
+      `<rect x="-24" y="-52" width="48" height="52" fill="#d9c7a8"/>`+
+      `<rect x="-24" y="-52" width="48" height="4" fill="${C.wood2}"/>`+
+      roof(-52,30)+`<rect x="-16" y="-44" width="32" height="30" fill="#c9b48a"/>`+
+      roof(-30,20)+`<rect x="-10" y="-24" width="20" height="18" fill="#c9b48a"/>`+roof(-6,12)+
+      `<rect x="-6" y="-14" width="4" height="8" fill="${C.tentDoor}"/><rect x="2" y="-14" width="4" height="8" fill="${C.tentDoor}"/>`+
+      `<rect x="-4" y="-40" width="8" height="6" fill="${C.gold}"/></g>`; }
+  function stele(x, baseY, s){ s=s||1; return `<g transform="translate(${x},${baseY}) scale(${s})">`+
+      `<rect x="-14" y="-6" width="28" height="6" fill="#7a7f8c"/>`+
+      `<path d="M-11 -6 L-11 -50 Q0 -60 11 -50 L11 -6 Z" fill="#9aa3b2" stroke="#5a6472" stroke-width="1.4"/>`+
+      `<circle cx="0" cy="-34" r="6" fill="none" stroke="${C.crimson}" stroke-width="1.6"/>`+
+      `<path d="M0 -38 q3 4 0 8 q-3 -4 0 -8z" fill="${C.crimson}"/></g>`; }
+  function skull(x,y,s){ s=s||1; return `<g transform="translate(${x},${y}) scale(${s})">`+
+      `<path d="M-9 2 Q-12 -14 0 -14 Q12 -14 9 2 L5 2 L5 6 L-5 6 L-5 2 Z" fill="#e8e2d0" stroke="#b8b09a" stroke-width="1"/>`+
+      `<circle cx="-4" cy="-3" r="2.4" fill="#2b2b33"/><circle cx="4" cy="-3" r="2.4" fill="#2b2b33"/>`+
+      `<path d="M-1 0 L1 0 L0 3 Z" fill="#2b2b33"/></g>`; }
+  function grave(x, baseY, s){ s=s||1; return `<g transform="translate(${x},${baseY}) scale(${s})">`+
+      `<rect x="-3" y="-40" width="6" height="40" fill="#c9b48a"/>`+
+      `<path d="M-3 -40 l3 -5 3 5z" fill="#c9b48a"/>`+
+      `<line x1="-3" y1="-30" x2="3" y2="-30" stroke="${C.wood2}" stroke-width="1"/>`+
+      `<line x1="-3" y1="-22" x2="3" y2="-22" stroke="${C.wood2}" stroke-width="1"/></g>`; }
+  function coinPile(x, baseY){ let s=""; const spots=[[0,0],[-8,1],[8,1],[-4,-4],[4,-4],[0,-8]];
+    for(const [dx,dy] of spots){ s+=`<circle cx="${x+dx}" cy="${baseY+dy}" r="5" fill="${C.gold}" stroke="#7a5216" stroke-width="1"/>`+
+      `<rect x="${x+dx-1.6}" y="${baseY+dy-1.6}" width="3.2" height="3.2" fill="#7a5216"/>`; } return s; }
+  function bridge(){ return `<path d="M40 176 Q150 140 260 176" fill="none" stroke="${C.wood2}" stroke-width="6"/>`+
+      `<path d="M40 176 Q150 146 260 176" fill="none" stroke="${C.wood}" stroke-width="3"/>`+
+      `<g stroke="${C.wood2}" stroke-width="2">`+Array.from({length:7},(_,i)=>`<line x1="${60+i*30}" y1="${168-Math.round(Math.sin(i/6*Math.PI)*22)}" x2="${60+i*30}" y2="176"/>`).join("")+`</g>`; }
+  function dais(x,baseY,w){ return `<rect x="${x-w}" y="${baseY-6}" width="${w*2}" height="6" fill="${C.wood}"/>`+
+      `<rect x="${x-w}" y="${baseY-10}" width="${w*2}" height="4" fill="${C.crimson}"/>`; }
+
   /* ---------------- MOTIFS (foreground per encounter) ------------------ */
   function playerOpts(inj, tool, S){ return { robe:robeFor(S), hat:"kasa", tool:tool, injury:inj }; }
 
@@ -564,6 +603,7 @@ window.SCENE = (function () {
   function render(){
     const el = document.getElementById("scene-svg");
     if(!el) return;
+    el.setAttribute("viewBox", `0 0 ${W} ${H}`);
     const S = st.S || {};
     const rest = st.mode==="camp";
     const biome = biomeOf(S);
@@ -592,5 +632,104 @@ window.SCENE = (function () {
   function setEncounter(enc, S){ snapshot(S); st.mode="encounter"; st.tag=classify(enc); render(); }
   function setMotif(tag, S){ snapshot(S); st.mode="encounter"; st.tag=tag; render(); }
 
-  return { reset, sync, setCamp, setEncounter, setMotif, render };
+  /* ---- ending art: a full framed scene for the run's final beat -------- */
+  const ENDMOTIF = {
+    death_hunted:"poison", death_wild:"storm", death_generic:"wounded",
+    legend:"war_council", unify:"war_council", province_held:"court",
+    revenge_done:"reckoning", pilgrimage_done:"shrine", satori:"vision",
+    fortune_made:"market", duty_done:"court", peace_sealed:"tea",
+    contract_kept:"poison", escape_done:"road", peoples_hero:"festival",
+    survive_well:"camp", survive_hard:"cave", epilogue:"setting_out",
+  };
+  // bespoke, hand-composed final scenes — each returns {time,biome?,svg}
+  const P = (x,by,sc,o)=>person(x,by,sc,o); // shorthand
+  const ENDART = {
+    satori:(x)=>({ time:"dawn", biome:"mountain", svg:
+      ensoRing(214,64,26)+ bigMoon(214,64,7,C.gold)+ pine(40,HZ+6,1.1)+
+      `<path d="M110 ${GY} q40 -6 80 0" stroke="${C.paper}" stroke-width="1" opacity="0.3" fill="none"/>`+
+      P(150,GY,1.2,{robe:robeFor(x.S),hat:"none",injury:0,pose:"bow"}) }),
+    unify:(x)=>({ time:"day", svg:
+      banner(40,GY,1.15)+banner(84,GY,1.0)+banner(260,GY,1.0)+banner(288,GY,1.15)+
+      dais(150,GY,44)+ P(150,GY-10,1.35,{robe:C.robeNoble,hat:"none",tool:null,injury:0})+
+      `<g transform="translate(163,${GY-40})">${weapon("staff")}</g>`+
+      P(96,GY,1.0,{robe:C.robeWarrior,hat:"helmet",injury:0,pose:"bow"})+
+      P(204,GY,1.0,{robe:C.robeWarrior,hat:"helmet",injury:0,pose:"bow",flip:true}) }),
+    legend:(x)=>({ time:"dusk", svg:
+      stele(200,GY,1.5)+ crow(150,70)+crow(120,84)+
+      P(96,GY,1.1,{robe:robeFor(x.S),hat:"kasa",injury:0,pose:"bow"}) }),
+    province_held:(x)=>({ time:"day", svg:
+      castle(196,HZ+2,1.2)+ banner(120,GY,1.15)+
+      P(96,GY,1.15,{robe:robeFor(x.S),hat:"helmet",tool:x.tool||"katana",injury:x.inj}) }),
+    revenge_done:(x)=>({ time:"dusk", weather:"rain", svg:
+      lantern(56,GY,1.1)+ P(206,GY,1.05,{robe:"#3a2f42",injury:0,pose:"fallen"})+
+      P(120,GY,1.25,{robe:robeFor(x.S),hat:"none",tool:x.tool||"katana",injury:Math.max(1,x.inj),pose:"bow"}) }),
+    pilgrimage_done:(x)=>({ time:"dawn", biome:"shrine", svg:
+      torii(150,GY,1.7)+ lantern(96,GY,1.1)+lantern(204,GY,1.1)+
+      `<rect x="120" y="${GY}" width="60" height="4" fill="${C.groundDk}"/>`+
+      P(150,GY,1.2,{robe:C.robeRelig,hat:"none",injury:0,pose:"bow"}) }),
+    fortune_made:(x)=>({ time:"day", svg:
+      `<rect x="176" y="${GY-16}" width="18" height="16" fill="${C.wood}" stroke="${C.wood2}" stroke-width="1.2"/>`+
+      `<rect x="196" y="${GY-22}" width="20" height="22" fill="${C.wood}" stroke="${C.wood2}" stroke-width="1.2"/>`+
+      `<path d="M176 ${GY-16}h18M196 ${GY-22}h20" stroke="${C.wood2}"/>`+
+      coinPile(150,GY-4)+ horse(232,GY,1.0)+
+      P(96,GY,1.2,{robe:C.robeMerch,hat:"none",injury:x.inj}) }),
+    duty_done:(x)=>({ time:"day", svg:
+      `<rect x="150" y="66" width="150" height="7" fill="${C.crimson}"/>`+
+      `<g stroke="${C.paper}" stroke-width="6" opacity="0.85"><line x1="180" y1="73" x2="180" y2="120"/><line x1="220" y1="73" x2="220" y2="120"/><line x1="260" y1="73" x2="260" y2="120"/></g>`+
+      banner(286,GY,1.0)+ P(210,GY,1.05,{robe:C.robeNoble,hat:"none",injury:0,pose:"sit"})+
+      P(120,GY,1.15,{robe:robeFor(x.S),hat:"helmet",tool:x.tool||"katana",injury:x.inj}) }),
+    peace_sealed:(x)=>({ time:"day", svg:
+      banner(50,GY,1.1)+banner(250,GY,1.1)+ pine(150,HZ+6,1.0)+
+      P(112,GY,1.15,{robe:C.robeWarrior,hat:"none",injury:0})+
+      P(188,GY,1.15,{robe:C.robeNoble,hat:"none",injury:0,flip:true})+
+      `<path d="M126 ${GY-20} h48" stroke="${C.gold}" stroke-width="2"/>` }),
+    contract_kept:(x)=>({ time:"night", svg:
+      `<rect x="0" y="0" width="${W}" height="${H}" fill="#0a0c16" opacity="0.4"/>`+ lantern(70,GY,1.1)+
+      P(112,GY,1.15,{robe:"#1c1c26",hat:"hood",injury:0})+
+      P(196,GY,1.15,{robe:robeFor(x.S),hat:"hood",tool:x.tool,injury:x.inj,flip:true})+
+      `<circle cx="150" cy="${GY-18}" r="4" fill="${C.gold}"/>` }),
+    escape_done:(x)=>({ time:"dawn", biome:"river", svg:
+      bridge()+ P(196,168,1.1,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:x.inj,flip:true}) }),
+    peoples_hero:(x)=>({ time:"day", svg:
+      `<g>`+Array.from({length:6},(_,i)=>`<line x1="${24+i*50}" y1="70" x2="${49+i*50}" y2="60" stroke="${C.wood2}" stroke-width="0.8"/><circle cx="${36+i*50}" cy="72" r="5" fill="${i%2?C.crimson:C.lantern}"/>`).join("")+`</g>`+
+      crowd(80,GY,3)+crowd(224,GY,3)+
+      P(150,GY,1.3,{robe:robeFor(x.S),hat:"none",tool:x.tool,injury:x.inj,pose:"fight"}) }),
+    survive_well:(x)=>({ time:"dusk", svg:
+      pine(40,HZ+6,1.1)+pine(266,HZ+8,0.95)+
+      `<path d="M198 ${GY} L224 ${GY-42} L250 ${GY} Z" fill="${C.tent}" stroke="${C.tentDk}" stroke-width="1.4"/>`+
+      firePit(180,GY,1.0)+ P(120,GY,1.15,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:x.inj,pose:"sit"}) }),
+    survive_hard:(x)=>({ time:"dusk", weather:"rain", svg:
+      `<path d="M28 ${HZ+4} q-6 -20 -18 -28 q14 2 22 12" fill="${C.pineDk}"/>`+ crow(210,80)+
+      P(150,GY,1.2,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:3,pose:"bow"}) }),
+    death_generic:(x)=>({ time:"dusk", svg:
+      grave(150,GY,1.2)+ `<path d="M138 ${GY-40} q12 -6 24 0 q0 4 -12 4 q-12 0 -12 -4z" fill="${C.straw}" stroke="${C.wood2}" stroke-width="0.8"/>`+
+      crow(110,78)+crow(200,70) }),
+    death_wild:(x)=>({ time:"night", biome:"mountain", weather:"snow", svg:
+      skull(150,168,1.5)+ `<g stroke="#d9dbe4" stroke-width="2" opacity="0.8"><path d="M132 182 q18 -8 36 0"/><path d="M136 188 q14 -6 28 0"/></g>` }),
+    death_hunted:(x)=>({ time:"night", svg:
+      `<rect x="0" y="0" width="${W}" height="${H}" fill="#080a14" opacity="0.5"/>`+ lantern(60,GY,1.1)+
+      P(140,GY,1.1,{robe:robeFor(x.S),injury:0,pose:"fallen"})+
+      P(210,GY,1.15,{robe:"#14141c",hat:"hood",tool:"katana",injury:0,flip:true}) }),
+  };
+
+  // returns a standalone SVG string (its own <svg>) sized 300x210
+  function endingArt(end, S){
+    snapshot(S);
+    const ctx = { S, inj:injuryLevel(), tool:toolGlyphKey(S), biome:biomeOf(S), time:"day", weather:"clear" };
+    const bespoke = end && ENDART[end.id] ? ENDART[end.id](ctx) : null;
+    let biome = (bespoke && bespoke.biome) || biomeOf(S);
+    let time = (bespoke && bespoke.time) || (end && end.tone==="bad" ? "dusk" : "day");
+    let weather = (bespoke && bespoke.weather) || "clear";
+    let s = backdrop(biome, time, weather);
+    if(bespoke){ s += bespoke.svg; }
+    else {
+      const tag = (end && ENDMOTIF[end.id]) || "road";
+      if(tag==="camp") s += camp(ctx); else s += (MOTIF[tag]||MOTIF.road)(ctx);
+    }
+    s += frameOverlay();
+    return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" `+
+      `style="width:100%;height:auto;display:block">${s}</svg>`;
+  }
+
+  return { reset, sync, setCamp, setEncounter, setMotif, endingArt, render };
 })();

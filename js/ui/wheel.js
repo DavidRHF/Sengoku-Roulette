@@ -136,16 +136,21 @@ window.WHEEL = (function () {
     wedgeGroup.style.transform = `rotate(${rot}deg)`;
   }
 
-  /* Spin so segment `winnerIndex` stops centred under the pointer (0°). */
+  /* Spin so segment `winnerIndex` stops under the pointer (0°) — landing at a
+   * random point within that wedge (not its exact centre) so it feels real. */
   function spinTo(winnerIndex, cb) {
     if (spinning || !wedgeGroup) return;
     spinning = true;
-    const mid = wedges[winnerIndex] ? wedges[winnerIndex].mid : 0;
-    // rotation that brings this wedge's centre to 0° (mod 360)
-    const target = ((-mid) % 360 + 360) % 360;
+    const w = wedges[winnerIndex] || { a0: 0, a1: 360, mid: 0 };
+    const span = w.a1 - w.a0;
+    // keep a small margin from the dividers so it never looks like it split two slices
+    const margin = Math.min(span * 0.18, 8);
+    const landAngle = w.a0 + margin + Math.random() * Math.max(0.0001, span - 2 * margin);
+    // rotation that brings that point of the wheel to 0° (mod 360)
+    const target = ((-landAngle) % 360 + 360) % 360;
     let delta = ((target - (currentRot % 360)) % 360 + 360) % 360;
     const startRot = currentRot;
-    const endRot = startRot + delta + 360 * 5;   // five full turns, exact landing
+    const endRot = startRot + delta + 360 * 5;   // five full turns, then settle
     const t0 = performance.now();
     const ease = p => 1 - Math.pow(1 - p, 3);     // easeOutCubic — decelerates
 

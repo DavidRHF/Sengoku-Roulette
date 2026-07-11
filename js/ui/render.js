@@ -152,17 +152,78 @@ window.UI = (function () {
   }
 
   /* ---- modal (How to Play / ending) ----------------------------------- */
-  function modal(titleText, bodyHtml, btnLabel, onClose) {
+  function modal(titleText, bodyHtml, btnLabel, onClose, cls) {
     $("modal-title").textContent = titleText;
     $("modal-body").innerHTML = bodyHtml;
+    const card = document.querySelector("#modal .modal-card");
+    if (card) card.className = "modal-card" + (cls ? " " + cls : "");
     const b = $("modal-btn");
     b.textContent = btnLabel || "Close";
     b.onclick = () => { sfx.click(); $("modal").classList.remove("show"); if (onClose) onClose(); };
     $("modal").classList.add("show");
   }
 
+  // a shrouding of black cloud for undiscovered endings
+  function cloudSVG() {
+    return `<svg viewBox="0 0 120 80" class="ending-cloud" preserveAspectRatio="xMidYMid slice">` +
+      `<rect width="120" height="80" fill="#0a0b12"/>` +
+      `<g fill="#171826">` +
+      `<path d="M-4 62 q10-16 26-10 q6-16 24-12 q14-8 26 6 q18-6 22 12 q10 2 10 18 H-4 Z"/>` +
+      `<path d="M-4 34 q12-12 24-4 q10-14 26-6 q16-10 30 4 q14-2 20 12 H-4 Z" opacity="0.85"/>` +
+      `</g>` +
+      `<g fill="#20223400"><animateTransform attributeName="transform" type="translate" ` +
+      `values="0 0;6 0;0 0" dur="7s" repeatCount="indefinite"/></g>` +
+      `<text x="60" y="46" text-anchor="middle" font-size="20" fill="#3a3d52" ` +
+      `font-family="'Yuji Syuku',serif">？</text></svg>`;
+  }
+
+  // build the endings-gallery body (all endings; unseen ones shrouded)
+  function endingsGallery() {
+    const seen = new Set(STATE.seenEndings());
+    const all = DATA.endings.filter(e => e.id !== "epilogue");
+    const found = all.filter(e => seen.has(e.id)).length;
+    let cards = "";
+    for (const e of all) {
+      if (seen.has(e.id)) {
+        const teaser = (e.text || "").split(/(?<=[.!?])\s/)[0].slice(0, 120);
+        cards += `<div class="ending-card ending-tone-${e.tone}">` +
+          `<div class="ending-card-title">${e.title}</div>` +
+          `<div class="ending-card-tone">${toneWord(e.tone)}</div>` +
+          `<div class="ending-card-teaser">${teaser}</div></div>`;
+      } else {
+        cards += `<div class="ending-card locked">${cloudSVG()}` +
+          `<div class="ending-card-title locked-title">? ? ?</div></div>`;
+      }
+    }
+    return `<p class="sm">Endings discovered: <b>${found}</b> of ${all.length}. ` +
+      `Undiscovered fates lie shrouded — reach them to reveal them.</p>` +
+      `<div class="endings-grid">${cards}</div>` + syncPanel();
+  }
+  function syncPanel() {
+    if (!window.SYNC) return "";
+    if (SYNC.configured()) {
+      return `<div class="sync-box"><div class="sync-title">☁ Cross-device sync</div>` +
+        `<div class="sync-row">Your code: <code id="sync-code">${SYNC.code()}</code>` +
+        `<button class="sync-btn" id="sync-copy">Copy</button>` +
+        `<button class="sync-btn" id="sync-now">Sync now</button></div>` +
+        `<div class="sync-row"><input id="sync-input" class="sync-input" ` +
+        `placeholder="paste another device's code to link" autocomplete="off">` +
+        `<button class="sync-btn" id="sync-link">Link</button></div>` +
+        `<div class="sync-status" id="sync-status"></div></div>`;
+    }
+    return `<div class="sync-box"><div class="sync-title">☁ Cross-device sync — off</div>` +
+      `<div class="sync-note">Discoveries save in this browser only. To sync across devices, ` +
+      `deploy the small backend in <code>server/</code> and set its URL in <code>js/config.js</code> ` +
+      `(see <code>server/README.md</code>).</div></div>`;
+  }
+  function toneWord(t) {
+    return t === "great" ? "A legendary end" : t === "good" ? "A good end"
+      : t === "bad" ? "A grim end" : "An end";
+  }
+
   return {
     setTitle, setSub, setAction, hideAction, showAction,
     log, logNotes, rebuildJournal, renderSheet, modal, sfx, questLabel,
+    endingsGallery, cloudSVG,
   };
 })();
