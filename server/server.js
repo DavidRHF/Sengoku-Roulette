@@ -50,6 +50,10 @@ function setSet(code, arr) {
 }
 
 /* ---- routes ---- */
+app.get("/", (_req, res) => res.json({
+  ok: true, service: "sengoku-sync",
+  endpoints: ["/health", "GET /api/endings/:code", "POST /api/endings/:code", "POST /api/endings/:code/merge"],
+}));
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.get("/api/endings/:code", (req, res) => {

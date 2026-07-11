@@ -30,6 +30,9 @@ export default {
     const url = new URL(request.url);
     const parts = url.pathname.split("/").filter(Boolean); // ["api","endings",code, ("merge")?]
 
+    if (url.pathname === "/" )
+      return json({ ok: true, service: "sengoku-sync",
+        endpoints: ["/health", "/api/endings/:code", "/api/endings/:code/merge"] });
     if (url.pathname === "/health") return json({ ok: true });
     if (parts[0] !== "api" || parts[1] !== "endings") return json({ error: "not found" }, 404);
 
