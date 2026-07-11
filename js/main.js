@@ -27,15 +27,11 @@
       UI.modal("Begin anew?", "<p>Abandon the current road and spin a fresh fate?</p>",
         "Yes, a new road", () => GAME.newGame());
     };
-    $("btn-save").onclick = () => {
+    $("btn-endings").onclick = () => {
       UI.sfx.click();
-      const ok = STATE.save();
-      flash($("btn-save"), ok ? "Saved ✓" : "Save failed");
-    };
-    $("btn-load").onclick = () => {
-      UI.sfx.click();
-      if (STATE.load()) GAME.resume();
-      else flash($("btn-load"), "No save found");
+      UI.modal("Endings — the Fates You've Met", UI.endingsGallery(), "Close", null, "modal-gallery");
+      wireSync();
+      if (window.SYNC && SYNC.configured()) SYNC.pull().then(refreshGallery);
     };
     $("btn-how").onclick = () => { UI.sfx.click(); UI.modal("How to Play", HOW_TO, "To the road"); };
 
@@ -55,6 +51,35 @@
     const old = btn.textContent;
     btn.textContent = msg;
     setTimeout(() => (btn.textContent = old), 1200);
+  }
+
+  /* ---- endings-gallery cloud-sync controls ---------------------------- */
+  function setSyncStatus(m) { const s = document.getElementById("sync-status"); if (s) s.textContent = m; }
+  function refreshGallery() {
+    const body = document.getElementById("modal-body");
+    if (body) { body.innerHTML = UI.endingsGallery(); wireSync(); }
+  }
+  function wireSync() {
+    if (!window.SYNC) return;
+    const copy = document.getElementById("sync-copy");
+    if (copy) copy.onclick = () => {
+      const c = SYNC.code();
+      try { navigator.clipboard.writeText(c); setSyncStatus("Code copied to clipboard."); }
+      catch (e) {
+        const inp = document.getElementById("sync-input"); if (inp) { inp.value = c; inp.select(); }
+        setSyncStatus("Copy this code: " + c);
+      }
+    };
+    const now = document.getElementById("sync-now");
+    if (now) now.onclick = async () => { setSyncStatus("Syncing…"); await SYNC.pull(); setSyncStatus("Synced."); refreshGallery(); };
+    const link = document.getElementById("sync-link");
+    if (link) link.onclick = async () => {
+      const v = (document.getElementById("sync-input") || {}).value || "";
+      setSyncStatus("Linking…");
+      const r = await SYNC.link(v);
+      if (r.ok) { setSyncStatus("Linked and merged."); refreshGallery(); }
+      else setSyncStatus("That code looks invalid (6–40 letters/numbers).");
+    };
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
