@@ -73,7 +73,7 @@ DATA.encounters = [
           { label:"Chase it off", weight:6, valence:"bad", text:"You throw a stone. Bad idea. That night your food spoils and your sandals go missing.", hp:-4 },
         ] } } },
 
-  { id:"storm", art:"river", title:"Sudden Storm", loc:["road","wild","mountain","farm","any"], circles:["any"], weight:7,
+  { id:"storm", art:"storm", title:"Sudden Storm", loc:["road","wild","mountain","farm","any"], circles:["any"], weight:7,
     scene:{ text:"The sky goes bruise-purple and opens. Rain hammers the road to mud; thunder walks the ridgeline.",
       spin:{ prompt:"Where do you shelter?", stat:"wis",
         options:[
@@ -93,7 +93,7 @@ DATA.encounters = [
         ] } } },
 
   /* ===================== BRANCH: THE RAVINE ============================ */
-  { id:"ravine", title:"The Broken Path", loc:["wild","mountain","forest","river"], circles:["any"], weight:6,
+  { id:"ravine", art:"cave", title:"The Broken Path", loc:["wild","mountain","forest","river"], circles:["any"], weight:6,
     scene:{ text:"The trail crumbles beneath you and you slide down a wet ravine, landing hard in a cold, dark cleft. Above, the path is out of reach.",
       spin:{ prompt:"You are hurt and trapped. What now?", stat:"wis",
         options:[
@@ -151,7 +151,7 @@ DATA.encounters = [
           { label:"Browse only", weight:7, valence:"neutral", text:"You window-shop the world's goods and leave with your coin intact.", hp:0 },
         ] } } },
 
-  { id:"cityfire", art:"battlefield", title:"Flowers of Edo", loc:["edo","city"], circles:["any"], weight:6,
+  { id:"cityfire", art:"fire", title:"Flowers of Edo", loc:["edo","city"], circles:["any"], weight:6,
     scene:{ text:"'Fire! Fire!' The cry runs the wooden streets — the flames the city grimly calls its 'flowers.' A child screams from an upper window.",
       spin:{ prompt:"The fire spreads fast.", stat:"str",
         options:[
@@ -160,7 +160,7 @@ DATA.encounters = [
           { label:"Flee the flames", weight:7, valence:"bad", text:"You save yourself. Behind you a scream cuts off, and something in you cools that will not warm again.", flag:"unkind" },
         ] } } },
 
-  { id:"audience", title:"Audience at the Manor", loc:["city","edo","kyoto"], circles:["noble","warrior","entertainer","religious"], weight:6,
+  { id:"audience", art:"war_council", title:"Audience at the Manor", loc:["city","edo","kyoto"], circles:["noble","warrior","entertainer","religious"], weight:6,
     scene:{ text:"A local lord grants you audience. Cushions, tea, and a dozen unspoken tests of your manners and your worth.",
       spin:{ prompt:"Comport yourself before the lord.", stat:"cha",
         options:[
@@ -276,7 +276,7 @@ DATA.encounters = [
           { label:"Haggle the fare", weight:7, valence:"neutral", text:"You talk him down a few mon. He grumbles but poles you across.", hp:0 },
         ] } } },
 
-  { id:"nanban", title:"The Foreign Ship", loc:["coast"], circles:["merchant","noble","any"], weight:5,
+  { id:"nanban", art:"nanban", title:"The Foreign Ship", loc:["coast"], circles:["merchant","noble","any"], weight:5,
     scene:{ text:"A great black-hulled ship of the nanban — the southern barbarians — rides at anchor. Red-haired men trade strange goods: glass, tobacco, and iron thunder-sticks.",
       spin:{ prompt:"Approach the foreigners.", stat:"wis",
         options:[
@@ -333,7 +333,7 @@ DATA.encounters = [
         ] } } },
 
   /* ===================== WARRIOR / CRIMINAL SPECIFIC ================== */
-  { id:"lord_offer", title:"Service Offered", loc:["city","edo","kyoto","road"], circles:["warrior","ronin","noble"], weight:6,
+  { id:"lord_offer", art:"war_council", title:"Service Offered", loc:["city","edo","kyoto","road"], circles:["warrior","ronin","noble"], weight:6,
     scene:{ text:"A lord's steward finds you at a teahouse. 'My master needs blades of quality. He pays in rice and land. Are you for hire?'",
       spin:{ prompt:"Consider the offer of service.", stat:"cha",
         options:[
@@ -454,7 +454,7 @@ DATA.encounters = [
    *  and by `minStep` so they land like turning-points, not noise.
    * ===================================================================== */
 
-  { id:"old_enemy", art:"duel", title:"A Face from the Ash", loc:["any"], circles:["any"], weight:5, once:true, minStep:3,
+  { id:"old_enemy", art:"reckoning", title:"A Face from the Ash", loc:["any"], circles:["any"], weight:5, once:true, minStep:3,
     scene:{ text:"Across a crowded ford-town you see him: the man whose order burned your old life to the ground. He has not seen you. Yet.",
       spin:{ prompt:"What rises in you?", stat:"wis",
         options:[
@@ -463,7 +463,7 @@ DATA.encounters = [
           { label:"Let the dead stay buried", weight:7, valence:"neutral", text:"You turn away. The past is a country you refuse to re-enter. It costs you something to do it.", flag:"resolved", hp:2 },
         ] } } },
 
-  { id:"the_reckoning", title:"The Reckoning", loc:["any"], circles:["any"], weight:8, once:true, minStep:8, requiresQuest:"revenge",
+  { id:"the_reckoning", art:"reckoning", title:"The Reckoning", loc:["any"], circles:["any"], weight:8, once:true, minStep:8, requiresQuest:"revenge",
     scene:{ text:"The hunt ends here, in a rain-dark courtyard. Your enemy turns, older than your memory of him, and knows you at once. 'So,' he says. 'You lived.'",
       spin:{ prompt:"Finish it.", stat:"str",
         options:[
@@ -472,7 +472,7 @@ DATA.encounters = [
           { label:"Strike in blind fury", weight:8, valence:"bad", text:"Rage makes you clumsy. You kill him, yes — but his guards open you to the bone in the doing.", flag:"resolved", hp:-16 },
         ] } } },
 
-  { id:"sacred_summons", title:"The Summons in the Smoke", loc:["shrine","sacred","mountain","forest","any"], circles:["any"], weight:5, once:true, minStep:2,
+  { id:"sacred_summons", art:"vision", title:"The Summons in the Smoke", loc:["shrine","sacred","mountain","forest","any"], circles:["any"], weight:5, once:true, minStep:2,
     scene:{ text:"In incense-smoke at a wayside altar, a certainty takes you: there is a far shrine, and it is calling. The feeling is older than reason.",
       spin:{ prompt:"Do you heed the call?", stat:"wis",
         options:[
@@ -481,7 +481,7 @@ DATA.encounters = [
           { label:"Shake it off", weight:7, valence:"neutral", text:"You are no saint and say so. Still, the feeling leaves a mark, like a door you chose not to open.", hp:1 },
         ] } } },
 
-  { id:"war_council", title:"The War-Fan Offered", loc:["edo","kyoto","city","road"], circles:["noble","warrior"], weight:6, once:true, minStep:4,
+  { id:"war_council", art:"war_council", title:"The War-Fan Offered", loc:["edo","kyoto","city","road"], circles:["noble","warrior"], weight:6, once:true, minStep:4,
     scene:{ text:"A great lord's envoy kneels before you with a lacquered war-fan on outstretched hands. 'My master gathers the provinces. He asks not for your sword, but for your name beside his.'",
       spin:{ prompt:"How large is your ambition?", stat:"cha",
         options:[
@@ -500,7 +500,7 @@ DATA.encounters = [
           { label:"Dismiss it as a lie", weight:7, valence:"neutral", text:"You have heard a hundred such tales. You let this one pass with the drunk who told it.", hp:0 },
         ] } } },
 
-  { id:"false_charge", title:"Branded", loc:["city","edo","kyoto","outskirts","road"], circles:["any"], weight:5, once:true, minStep:3, forbidFlag:"sworn_service",
+  { id:"false_charge", art:"execution", title:"Branded", loc:["city","edo","kyoto","outskirts","road"], circles:["any"], weight:5, once:true, minStep:3, forbidFlag:"sworn_service",
     scene:{ text:"Soldiers seize you in the street for a crime you did not commit — a magistrate needs a culprit and your face will do. Your old life ends in an eyeblink.",
       spin:{ prompt:"The trap closes. React.", stat:"cha",
         options:[
@@ -550,8 +550,63 @@ DATA.encounters = [
       spin:{ prompt:"Avoid the muster?", stat:"cha",
         options:[
           { label:"Talk your way past", weight:9, valence:"good", boostItem:"Travel papers", boostAmt:2.4, text:"Papers, a title, a lord's name — you give him reasons enough to wave you on.", hp:0 },
-          { label:"Buy him off", weight:7, valence:"good", needItem:"Coin purse", consume:"Coin purse", text:"A coin in the sergeant's palm buys a sudden blindness. He finds another ox.", },
+          { label:"Buy him off", weight:7, valence:"good", needItem:"Coin purse", consume:"Coin purse", text:"A coin in the sergeant's palm buys a sudden blindness. He finds another ox." },
           { label:"Show your rank", weight:8, valence:"good", boostItem:"Clan crest", boostAmt:2.4, text:"Your crest turns the sergeant's greed to a hasty bow. He seeks his spears elsewhere.", hp:0 },
           { label:"Shoved into the line", weight:9, valence:"bad", text:"There is no arguing with six spears. They take your name, your freedom, and your afternoon.", predicament:"conscript" },
+        ] } } },
+
+  { id:"tea_ceremony", art:"tea", title:"Peace in a Bowl", loc:["kyoto","edo","city","shrine"], circles:["noble","artisan","religious","any"], weight:5, minStep:2,
+    scene:{ text:"Two hard-eyed captains of rival houses are seated in a tea-room, and the host has fallen ill. Someone must whisk and pour before the silence curdles into steel.",
+      spin:{ prompt:"Keep the peace.", stat:"cha",
+        options:[
+          { label:"A flawless service", weight:10, valence:"good", boostItem:"Tea whisk", boostAmt:2.8, text:"Every motion is water. By the last bowl the captains are trading verses, not threats. A grateful lord marks your name.", flag:"patron" },
+          { label:"A quiet, humble pour", weight:8, valence:"good", boostItem:"Poem card", boostAmt:1.8, text:"You make yourself small and the ritual large. The tension drains into the steam.", hp:2 },
+          { label:"A clumsy fumble", weight:7, valence:"bad", text:"Your hand shakes; the whisk clatters. The spell breaks, and one captain leaves with his hand on his hilt.", flag:"marked" },
+        ] } } },
+
+  { id:"sumo_bout", art:"sumo", title:"The Grand Bout", loc:["edo","city","shrine","kyoto"], circles:["entertainer","low","warrior","any"], weight:6,
+    scene:{ text:"A ring of sand, a roaring shrine-crowd, and a mountain of a man beckoning you onto the dohyō. Wagers pile as high as the purse.",
+      spin:{ prompt:"Take the ring?", stat:"str",
+        options:[
+          { label:"Drive him out", weight:9, valence:"good", boostItem:"Ceremonial apron", boostAmt:2.8, text:"Belt to belt, you find the angle and walk him backward over the bales. The crowd erupts and coins rain.", item:"Wager winnings", flag:"beloved" },
+          { label:"Win on technique", weight:7, valence:"good", text:"You slip his charge and let his own weight throw him down. A cannier victory, and a lighter purse.", item:"Hidden coin" },
+          { label:"Thrown from the ring", weight:8, valence:"bad", text:"He is a landslide with a topknot. You land in the third row, and your pride lands harder.", hp:-9 },
+        ] } } },
+
+  { id:"cavalry_charge", art:"cavalry", title:"Horsemen on the Ridge", loc:["road","tokaido","rural","farm","wild","outskirts"], circles:["warrior","noble","any"], weight:5, minStep:2,
+    scene:{ text:"A scattering of enemy riders wheels across the open ground ahead, lances lowering. On foot you are a rabbit; the question is what you do about it.",
+      spin:{ prompt:"Face the horsemen.", stat:"str",
+        options:[
+          { label:"Ride them down", weight:9, valence:"good", needItem:"Riding crop", text:"You take a loose mount and meet the charge as an equal. Speed answers speed, and the ridge is yours.", item:"Battlefield spoils", flag:"honored_dead" },
+          { label:"Break their charge", weight:7, valence:"good", boostItem:"Clan crest", boostAmt:1.8, text:"You set yourself behind a fence-line where horses will not go and turn their rush aside.", hp:-3 },
+          { label:"Ridden down", weight:8, valence:"bad", text:"A lance takes you off your feet before you hear the hooves. You crawl from under a dying horse, badly used.", hp:-13 },
+        ] } } },
+
+  { id:"plague_village", art:"plague", title:"The Fever Road", loc:["rural","farm","road","tokaido","outskirts","any"], circles:["artisan","religious","any"], weight:5, minStep:2,
+    scene:{ text:"A village gate hung with straw ropes and warning-charms. Coughing carries from within, and no one has come or gone in days. A child watches you from the ditch.",
+      spin:{ prompt:"Enter the sick village?", stat:"wis",
+        options:[
+          { label:"Treat the stricken", weight:11, valence:"good", needItem:"Medicine box", consume:"Healing herbs", text:"You boil herbs, break fevers, and burn the foul bedding. In a week the worst has passed, and the village would die for you now.", flag:"beloved", maxhp:3 },
+          { label:"Do what little you can", weight:7, valence:"good", boostItem:"Sutra scroll", boostAmt:1.8, text:"No cure, but clean water, kind words, and prayers for the dying. It is not nothing.", flag:"temple_ally" },
+          { label:"Catch the sickness", weight:8, valence:"bad", text:"You breathe what they breathe, and by the next village the fever is in you too.", hp:-12 },
+          { label:"Turn away", weight:6, valence:"neutral", text:"You are no healer, and the dead cannot be argued with. You skirt the village and carry the child's stare with you.", hp:0 },
+        ] } } },
+
+  { id:"sea_raid", art:"harbor", title:"The Grounded Junk", loc:["coast"], circles:["criminal","wanderer","any"], weight:6,
+    scene:{ text:"A trading junk lies heeled over on the tide-flats, its crew fled or drowned, its hold still full. And you are not the only one who has seen it from the shore.",
+      spin:{ prompt:"Claim the wreck?", stat:"str",
+        options:[
+          { label:"Take it by the blade", weight:9, valence:"good", boostItem:"Cutlass", boostAmt:2.6, text:"You reach the deck first and hold the plank against the others until the tide decides it. The hold is yours.", item:"Salvaged cargo" },
+          { label:"Dive the flooded hold", weight:7, valence:"good", boostItem:"Sea charm", boostAmt:1.8, text:"You go under for the good cargo while the others squabble on deck, and slip away heavy-laden.", item:"Salvaged cargo", hp:-2 },
+          { label:"Caught by the tide", weight:8, valence:"bad", text:"The sea comes back faster than you reckoned. You lose your footing and half-drown clawing back to shore, empty-handed.", hp:-10 },
+        ] } } },
+
+  { id:"blind_song", art:"biwa", title:"The Tale of the Fallen", loc:["kyoto","city","shrine","road","tokaido"], circles:["entertainer","religious","any"], weight:5,
+    scene:{ text:"Soldiers on the road, drunk and looking for trouble — until you unsling the biwa and begin the lament of a house they all lost kin to. The road goes very quiet.",
+      spin:{ prompt:"Play for your life.", stat:"cha",
+        options:[
+          { label:"Sing them to tears", weight:10, valence:"good", boostItem:"Biwa lute", boostAmt:2.8, text:"By the last verse hard men are weeping openly. They press coin on you and beg you to pass in peace.", item:"Festival gifts", flag:"beloved" },
+          { label:"A safe, sombre tune", weight:8, valence:"good", text:"Not your finest, but enough. Their mood turns from menace to melancholy, and they let you go.", hp:0 },
+          { label:"A sour note", weight:7, valence:"bad", text:"A cracked string, a broken spell. The drunkards remember they were looking for trouble.", hp:-7 },
         ] } } },
 ];

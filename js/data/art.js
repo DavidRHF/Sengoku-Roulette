@@ -137,6 +137,36 @@ window.ART = (function () {
       `<path d="M16 20q8-5 16 0l3 17q-11 4-22 0z" fill="${P.wood}" stroke="${P.wood2}" stroke-width="1.4"/>`+
       `<path d="M18 18l6-9 6 9" stroke="${P.crim}" stroke-width="2" fill="none"/>`+
       `<path d="M14 27h20" stroke="${P.wood2}" stroke-width="1.4"/>`),
+    conch: () => tile("#1b2f34",
+      `<path d="M30 14q8 2 8 12t-12 12q-12 0-14-10q-1-8 8-9q-6 5 0 9q5 3 9-2q3-5-1-9q-3-3-6-3z" fill="${P.bone}" stroke="#b3a473" stroke-width="1.2"/>`+
+      `<path d="M14 30l-4 6" stroke="${P.gold}" stroke-width="1.6"/>`),
+    apron: () => tile("#2a1420",
+      `<path d="M14 12h20l-2 20a10 10 0 0 1-16 0z" fill="${P.crim}" stroke="${P.gold}" stroke-width="1.4"/>`+
+      `<path d="M18 20h12M17 26h14" stroke="${P.gold}" stroke-width="1.4"/>`+
+      `<path d="M14 12l-4 8M34 12l4 8" stroke="${P.wood2}" stroke-width="1.6"/>`),
+    medicine: () => tile("#16261a",
+      `<rect x="12" y="16" width="24" height="20" rx="2" fill="${P.wood}" stroke="${P.wood2}" stroke-width="1.4"/>`+
+      `<rect x="12" y="22" width="24" height="1.6" fill="${P.wood2}"/><rect x="12" y="28" width="24" height="1.6" fill="${P.wood2}"/>`+
+      `<path d="M24 12v6M21 15h6" stroke="${P.jade}" stroke-width="2.4"/>`),
+    whisk: () => tile("#20240f",
+      `<path d="M18 34h12l-2-10h-8z" fill="${P.bone}"/>`+
+      `<g stroke="${P.paper2}" stroke-width="1">`+
+      `<line x1="20" y1="24" x2="19" y2="12"/><line x1="22" y1="24" x2="22" y2="11"/><line x1="24" y1="24" x2="24" y2="10"/><line x1="26" y1="24" x2="26" y2="11"/><line x1="28" y1="24" x2="29" y2="12"/></g>`),
+    lute: () => tile("#241c0f",
+      `<path d="M18 34a7 8 0 0 0 12-6c0-5-3-7-3-11l1-6-3 2-1 5c-4 1-6 4-6 8z" fill="${P.wood}" stroke="${P.wood2}" stroke-width="1.2"/>`+
+      `<g stroke="${P.paper}" stroke-width="0.7">`+
+      `<line x1="24" y1="14" x2="22" y2="30"/><line x1="26" y1="15" x2="25" y2="30"/></g>`),
+    crop: () => tile("#1c1a16",
+      `<line x1="14" y1="34" x2="30" y2="12" stroke="${P.wood}" stroke-width="2.4" stroke-linecap="round"/>`+
+      `<path d="M30 12l5 -2-2 5z" fill="${P.wood2}"/>`+
+      `<circle cx="14" cy="34" r="2.4" fill="${P.wood2}"/>`),
+    garb: () => tile("#161820",
+      `<path d="M16 14l8 3 8-3 2 6-4 3 1 13H17l1-13-4-3z" fill="#2b2b33" stroke="#12121a" stroke-width="1.2"/>`+
+      `<rect x="20" y="18" width="8" height="2.6" rx="1.3" fill="${P.gold}"/>`),
+    finery: () => tile("#221a2a",
+      `<path d="M16 12l8 4 8-4 3 5-5 4 2 15H18l2-15-5-4z" fill="${P.plum}" stroke="${P.gold}" stroke-width="1.2"/>`+
+      `<path d="M24 16v20" stroke="${P.gold}" stroke-width="1"/>`+
+      `<circle cx="24" cy="30" r="1.6" fill="${P.gold}"/>`),
   };
   function itemSVG(cat) { return (ITEM[cat] || ITEM.bundle)(); }
   function item(name) {

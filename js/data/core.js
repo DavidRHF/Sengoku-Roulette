@@ -166,6 +166,80 @@ DATA.statuses = [
     startLoc:"edo",
     startComp:"retainer",
     blurb:"A province bows to you and ten thousand spears answer your war-fan. But every ally would gladly wear your head." },
+
+  // ---- NEW STATIONS -----------------------------------------------------
+  { id:"yamabushi", name:"Yamabushi (Mountain Ascetic)", rarity:12, tier:"fortunate",
+    hp:28, str:10, wis:14, cha:8, luck:2,
+    circles:["religious","wanderer"],
+    startItems:["Conch horn","Sutra scroll","Mountain charm"],
+    startLoc:"mountain",
+    blurb:"You walk the ridgelines between the worlds, blowing the conch to wake the peaks. Hardship is your liturgy; the mountain, your temple." },
+
+  { id:"sumo", name:"Sumo Wrestler (Rikishi)", rarity:13, tier:"plain",
+    hp:40, str:16, wis:5, cha:9, luck:0,
+    circles:["entertainer","low"],
+    startItems:["Ceremonial apron","Sack of rice"],
+    startLoc:"edo",
+    blurb:"A mountain of disciplined flesh, fed on rice and glory. Shrine crowds roar your name; lords wager fortunes on your feet leaving the ring." },
+
+  { id:"physician", name:"Traveling Physician (Kusushi)", rarity:14, tier:"plain",
+    hp:24, str:7, wis:14, cha:8, luck:1,
+    circles:["artisan","wanderer"],
+    startItems:["Medicine box","Healing herbs"],
+    startLoc:"tokaido",
+    blurb:"You carry the smell of moxa and the trust of the desperate. In an age of blades, the one who mends them is never turned away." },
+
+  { id:"tea_master", name:"Tea Master (Chajin)", rarity:11, tier:"fortunate",
+    hp:22, str:6, wis:13, cha:13, luck:1,
+    circles:["artisan","noble"],
+    startItems:["Tea whisk","Poem card"],
+    startLoc:"kyoto",
+    blurb:"In a room the size of two mats you disarm warlords with a bowl of froth and a single flower. Power comes to be still in your presence." },
+
+  { id:"biwa", name:"Blind Biwa Minstrel (Biwa Hōshi)", rarity:15, tier:"plain",
+    hp:22, str:6, wis:12, cha:13, luck:2,
+    circles:["entertainer","religious","low"],
+    startItems:["Biwa lute"],
+    startLoc:"kyoto",
+    blurb:"Sightless, you sing the war-tales that make hard men weep. You pass where armies cannot, for who would strike down the voice of the dead?" },
+
+  { id:"pirate", name:"Wakō Sea-Raider", rarity:15, tier:"plain",
+    hp:30, str:14, wis:8, cha:8, luck:0,
+    circles:["criminal","wanderer"],
+    startItems:["Cutlass","Stolen coin","Sea charm"],
+    startLoc:"coast",
+    blurb:"The inland lords fear the sails on the horizon, and well they should. Salt, plunder, and a fast hull — the sea keeps no tax rolls." },
+
+  { id:"horsemaster", name:"Cavalry Rider (Bajō-musha)", rarity:11, tier:"fortunate",
+    hp:30, str:13, wis:8, cha:11, luck:1,
+    circles:["warrior","noble"],
+    startComp:"packhorse",
+    startItems:["Riding crop","Clan crest","Travel papers"],
+    startLoc:"tokaido",
+    blurb:"Born to the saddle, you are worth ten foot-soldiers and know it. A charging horse is the closest a mortal comes to a storm." },
+
+  { id:"jonin", name:"Shinobi Master (Jōnin)", rarity:6, tier:"fortunate",
+    hp:26, str:12, wis:15, cha:9, luck:1,
+    circles:["criminal","warrior"],
+    startComp:"shinobi_c",
+    startItems:["Shinobi garb","Smoke bombs","Grappling hook","Vial of poison"],
+    startLoc:"forest",
+    blurb:"You command a web of unseen hands from the shadows of a dozen provinces. Lords buy your loyalty by the season and never truly own it." },
+
+  { id:"exiled_noble", name:"Exiled Courtier", rarity:12, tier:"fortunate",
+    hp:22, str:7, wis:12, cha:14, luck:-1,
+    circles:["noble","wanderer"],
+    startItems:["Seal of office","Poem card","Faded finery","Travel papers"],
+    startLoc:"tokaido",
+    blurb:"A whispered slander cost you the capital, but not your name or your grudges. You walk the road plotting the ruin of the men who smiled as you fell." },
+
+  { id:"bandit_chief", name:"Mountain Bandit Chief", rarity:12, tier:"fortunate",
+    hp:32, str:15, wis:9, cha:12, luck:0,
+    circles:["criminal","warrior"],
+    startComp:"ashigaru",
+    startItems:["War fan","Bandit's purse","Cutlass"],
+    startLoc:"mountain",
+    blurb:"The passes are yours, and the tolls, and the fear. You rule a ragged army of the desperate — a lord in all but the blessing of birth." },
 ];
 
 /* -------------------------------------------------------------------- TOOLS */
@@ -229,6 +303,47 @@ DATA.tools = [
   { id:"masamune", name:"Masamune Blade", rarity:2, tier:"exalted",
     str:8, wis:2, cha:4, hp:5,
     blurb:"Steel so pure that leaves are said to drift around its edge rather than be cut. A relic worth a province." },
+
+  // ---- NEW TOOLS & WEAPONS ---------------------------------------------
+  { id:"yari", name:"Yari (Spear)", rarity:14, tier:"plain",
+    str:3, wis:1, cha:0, hp:1,
+    blurb:"The workhorse of every battlefield. Reach beats reach; the humble spear has ended more lords than any famous sword." },
+
+  { id:"kama", name:"Kama (Sickle)", rarity:15, tier:"poor",
+    str:2, wis:1, cha:-1, hp:0,
+    blurb:"A harvest-blade that reaps men as readily as rice. Cheap, hooked, and vicious in a practiced hand." },
+
+  { id:"tessen", name:"Tessen (Iron War-Fan)", rarity:12, tier:"plain",
+    str:2, wis:2, cha:3, hp:1,
+    blurb:"A fan that is also a bludgeon and a signal. Carried where blades are forbidden — courts, audiences, and quiet murders." },
+
+  { id:"shakuhachi", name:"Shakuhachi (Flute)", rarity:12, tier:"plain",
+    str:1, wis:3, cha:3, hp:0,
+    blurb:"A bamboo flute the wandering komusō monks play behind woven hats — and swing like a club when the song ends badly." },
+
+  { id:"soroban", name:"Merchant's Soroban", rarity:12, tier:"plain",
+    str:-1, wis:4, cha:3, hp:0,
+    blurb:"An abacus and a ledger. The deadliest weapon in a market, and half of one on a battlefield of debts." },
+
+  { id:"medchest", name:"Physician's Chest", rarity:11, tier:"fortunate",
+    str:0, wis:4, cha:2, hp:4,
+    blurb:"Moxa, needles, ground herbs, and foreign remedies. It buys welcome in every camp and mends what the road breaks." },
+
+  { id:"kusarigama", name:"Kusarigama (Chain-Sickle)", rarity:8, tier:"fortunate",
+    str:4, wis:3, cha:0, hp:1,
+    blurb:"A sickle chained to a weighted cord. Snares the sword-arm, then reaps it — a weapon that punishes the overconfident." },
+
+  { id:"kanabo", name:"Kanabō (War-Club)", rarity:7, tier:"fortunate",
+    str:6, wis:0, cha:1, hp:3,
+    blurb:"A studded iron bar as long as a man. Subtlety is for the enemy; this is the oni's own argument, and it always wins." },
+
+  { id:"teppo", name:"Tanegashima Matchlock", rarity:5, tier:"fortunate",
+    str:6, wis:2, cha:2, hp:1,
+    blurb:"Foreign fire in a wooden stock. Slow to load, but it turns a farmboy into the equal of a lifelong swordsman — and everyone knows it." },
+
+  { id:"odachi", name:"Ōdachi (Great Sword)", rarity:4, tier:"fortunate",
+    str:7, wis:1, cha:3, hp:2,
+    blurb:"A field-sword taller than its wielder, drawn from the back and swung to fell horse and rider in a single stroke." },
 ];
 
 /* --------------------------------------------------------------- COMPANIONS */

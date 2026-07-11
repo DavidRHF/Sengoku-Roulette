@@ -14,9 +14,17 @@ window.DATA = window.DATA || {};
 DATA.itemCat = function (name) {
   const n = (name || "").toLowerCase();
   if (/matchlock|teppo|teppō|musket|gun/.test(n)) return "gun";
-  if (/wakizashi|tant|katana|blade|sword|naginata/.test(n)) return "blade";
+  if (/wakizashi|tant|katana|blade|sword|naginata|cutlass|odachi|ōdachi/.test(n)) return "blade";
   if (/knife/.test(n)) return "knife";
   if (/spear|yari/.test(n)) return "spear";
+  if (/conch|horagai/.test(n)) return "conch";
+  if (/apron|mawashi/.test(n)) return "apron";
+  if (/medicine|physician|remed|moxa|chest/.test(n)) return "medicine";
+  if (/whisk|chasen/.test(n)) return "whisk";
+  if (/biwa|lute|shamisen/.test(n)) return "lute";
+  if (/crop|whip|riding/.test(n)) return "crop";
+  if (/garb|shozoku|shinobi|disguise/.test(n)) return "garb";
+  if (/finery|silk|kimono|robe/.test(n)) return "finery";
   if (/sutra|scroll/.test(n)) return "scroll";
   if (/papers|pass|itinerary|permit/.test(n)) return "papers";
   if (/ledger/.test(n)) return "ledger";
@@ -73,6 +81,17 @@ DATA.items = {
   "Lord's token": { desc:"A carved token of a lord's personal favor.", benefit:"Opens doors wherever his name is feared or loved." },
   "Nanban matchlock": { desc:"A foreign teppō off a Portuguese carrack — rare, loud, and dreaded.", benefit:"Grim leverage; decisive where firepower speaks." },
   "Assassin's mask": { desc:"A dark half‑mask, the quiet uniform of the trade.", benefit:"Marks you as one who moves in the underworld." },
+  "Conch horn": { desc:"A great sea-shell trumpet, the horagai the mountain ascetics sound from the ridgelines.", benefit:"Rallies and unnerves — widens bold, commanding outcomes in the wild and on the field." },
+  "Ceremonial apron": { desc:"A rikishi's embroidered kesho-mawashi, heavy with a shrine's blessing.", benefit:"Marks you a champion — widens contests of raw strength and the crowd's favor." },
+  "Medicine box": { desc:"A physician's inro of moxa, needles, and ground herbs.", benefit:"Widens the healing choice in encounters of sickness and plague, and buys welcome in any camp." },
+  "Tea whisk": { desc:"A bamboo chasen, worn soft from a thousand bowls of froth.", benefit:"Widens the graceful path in courts, audiences, and any test of composure." },
+  "Biwa lute": { desc:"A lacquered lute, its war-tales known from the capital to the coast.", benefit:"Widens performance, and opens passage where a singer of the dead is spared." },
+  "Cutlass": { desc:"A short, heavy sea-blade, notched from boarding-work.", benefit:"A weapon in hand — widens the fighting path, on deck or on the road." },
+  "Stolen coin": { desc:"Someone else's money, and no questions asked.", benefit:"Greases bribes and tolls; counts toward a Fortune." },
+  "Sea charm": { desc:"A shark-tooth amulet against drowning and the sea's moods.", benefit:"A ward of luck on water and the coast." },
+  "Riding crop": { desc:"A lacquered horse-crop, the mark of one born to the saddle.", benefit:"Widens outcomes on horseback — charges, chases, and swift escapes." },
+  "Shinobi garb": { desc:"A suit of dark shinobi-shōzoku, split-toed and silent.", benefit:"Widens infiltration and escape; makes you very hard to find." },
+  "Faded finery": { desc:"Court silks gone thin at the cuffs — the last of a ruined name.", benefit:"Still opens noble doors to those who don't look too closely." },
 };
 
 /* ---- resolve any item to a full card ----------------------------------- */
@@ -95,6 +114,14 @@ DATA.itemInfo = function (name) {
     charm:   { desc:"A blessed ward against misfortune.", benefit:"A little luck against the dark." },
     gun:     { desc:"A rare and dreaded firearm.", benefit:"Decisive leverage where firepower speaks." },
     mask:    { desc:"A dark mask of the shadow trades.", benefit:"Marks you to the underworld." },
+    conch:   { desc:"A great shell-trumpet.", benefit:"Rallies allies and unnerves foes." },
+    apron:   { desc:"A wrestler's ceremonial apron.", benefit:"Widens contests of strength and spectacle." },
+    medicine:{ desc:"A healer's chest of remedies.", benefit:"Widens the mending choice, and earns welcome." },
+    whisk:   { desc:"A tea-master's bamboo whisk.", benefit:"Widens grace and composure at court." },
+    lute:    { desc:"A minstrel's biwa.", benefit:"Widens performance and safe passage." },
+    crop:    { desc:"A rider's crop.", benefit:"Widens outcomes on horseback." },
+    garb:    { desc:"A suit of dark infiltrator's cloth.", benefit:"Widens stealth and escape." },
+    finery:  { desc:"Fine court silks.", benefit:"Opens noble doors." },
   };
   const fb = FB[cat] || { desc:"A thing you carry on your road.", benefit:"May prove useful before the journey ends." };
   return { title:name, cat, desc:fb.desc, benefit:fb.benefit };
