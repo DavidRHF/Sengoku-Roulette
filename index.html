@@ -33,10 +33,9 @@
       </div>
       <button id="btn-new" class="ctl ctl-crimson">⚔ New Game</button>
       <button id="btn-how" class="ctl ctl-gold">❔ How to Play</button>
-      <button id="btn-save" class="ctl">▣ Save</button>
-      <button id="btn-load" class="ctl">▤ Load</button>
+      <button id="btn-endings" class="ctl">📜 Endings</button>
       <div class="scene-frame">
-        <svg id="scene-svg" viewBox="0 0 220 176" aria-label="a scene of your journey, in the old style"></svg>
+        <svg id="scene-svg" viewBox="0 0 300 210" aria-label="a scene of your journey, in the old style"></svg>
       </div>
     </aside>
 
@@ -115,6 +114,10 @@
   <script src="js/data/items.js"></script>
   <script src="js/data/art.js"></script>
   <script src="js/data/predicaments.js"></script>
+  <!-- optional cross-device sync (safe no-ops when syncUrl is "") -->
+  <script src="js/config.js"></script>
+  <script src="js/net/sync.js"></script>
+
   <!-- engine -->
   <script src="js/engine/rng.js"></script>
   <script src="js/engine/state.js"></script>

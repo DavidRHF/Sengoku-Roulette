@@ -59,6 +59,10 @@ sengoku-wheel/
 └── js/
     ├── data/             # ← all content lives here (plain data, easy to expand)
     │   ├── core.js       #   30 statuses · 25 tools · companions · locations
+│   ├── config.js     #   optional cross-device sync URL (blank = offline)
+│   ├── net/sync.js   #   endings persistence + optional cloud sync
+│   ├── (assets/endings/)#   drop-in ending illustrations (see its README)
+│   └── (server/)     #   optional tiny sync backend (Express + CF Worker)
     │   ├── story.js      #   beginning story paths (circle‑tagged)
     │   ├── encounters.js #   road events (some multi‑spin branches)
     │   ├── rests.js      #   night events per location type
@@ -106,7 +110,7 @@ To add more, just append to the arrays — no engine changes needed.
 - `consume:"Smoke bombs"` — spends one of that item when the option resolves.
 Statuses begin with signature gear via `startItems:[…]` in `core.js`, so *who you are* changes *what you can do*.
 
-**The wheel shows the true odds.** Wedge sizes are drawn **proportional to each option's real weight** (stat + companions + luck + carried items), so a fat slice genuinely is more likely. The slices are **ordered smallest‑chance to largest** clockwise from the pointer, so you can read the odds at a glance, and labels always render upright whatever the wheel's resting angle.
+**The wheel shows the true odds.** Wedge sizes are drawn **proportional to each option's real weight** (stat + companions + luck + carried items), so a fat slice genuinely is more likely. The slices are **ordered smallest‑chance to largest** clockwise from the pointer, so you can read the odds at a glance, and labels always render upright whatever the wheel's resting angle. The wheel settles at a **random point inside** the winning slice (not dead‑centre) so each spin feels real.
 
 **Illustrated gear, tap for detail.** Every item and companion has its own bundled SVG picture (original CC0 art in `js/data/art.js` — no external images, so it works offline and on Pages with zero network). Tap any item or companion tile in the sidebar to open a card with its description and its concrete **benefit** (what it does mechanically, or the stat/luck bonus a companion brings). Item text and effects live in `js/data/items.js` (`DATA.itemInfo`), keyed by name with sensible category fallbacks so anything picked up on the road still gets a proper card.
 
@@ -118,6 +122,10 @@ Statuses begin with signature gear via `startItems:[…]` in `core.js`, so *who 
 - **It moves.** The campfire flickers and its glow pulses, and rain and snow actually fall — lightweight inline SVG animation, still fully offline.
 
 It repaints from true game state (`SCENE.sync`), all vector and offline in one flat palette. (Sound has been removed entirely.)
+
+**Ending screens.** Reaching an ending opens a large panel: the ending's telling on top, a framed **ending illustration** in the middle, and your final character sheet (station, tool, purpose, health, stats, companions, gear, steps, fate) below. Each ending has its **own bespoke placeholder scene** (satori's ensō and moon, a castle keep for a province held, bones on a snowed peak, a lone figure crossing a dawn bridge to freedom, and so on); drop a real image at `assets/endings/<ending-id>.png` (`.jpg`/`.webp` also work) and it appears there automatically — no code changes. See `assets/endings/README.txt` for the id list.
+
+**Endings gallery.** The **Endings** button opens a gallery of every possible fate. Ones you've reached show their title and a teaser; the rest stay **shrouded in black cloud** until you earn them. Discovery is remembered across runs (in `localStorage`), and can optionally **sync across devices**: deploy the tiny backend in `server/` (Express *or* a Cloudflare Worker), set its URL in `js/config.js`, then use **Endings → Cross-device sync** to copy your code to another device and merge your discoveries. It's fully optional — with no URL set the game stays 100% offline. Manual Save/Load is gone; the run still autosaves and resumes on reload.
 
 **Destiny can turn.** Some encounters (and a few campfire dreams) carry a `quest:"revenge"`‑style key that **rewrites your purpose** mid‑journey — a glimpsed old enemy, a lord's war‑fan, a false arrest, a shrine's summons. Gates like `requiresQuest`, `requiresItem`, `requiresStatus`, `forbidFlag`, `once` and `minStep` let these land as turning‑points and chain into follow‑ons (e.g. *A Face from the Ash* → *The Reckoning*), each routing to its own ending. And an encounter never repeats **twice in a row** — a rest has to fall between.
 
