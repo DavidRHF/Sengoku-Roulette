@@ -228,6 +228,20 @@ window.STATE = (function () {
   function hasSave() {
     try { return !!localStorage.getItem("sengoku_save"); } catch (e) { return false; }
   }
+
+  /* ---- endings gallery persistence (which endings you've ever reached) -- */
+  const SEEN_KEY = "sengoku_endings_v1";
+  function seenEndings() {
+    if (window.SYNC) return SYNC.localSeen();
+    try { return JSON.parse(localStorage.getItem(SEEN_KEY) || "[]"); } catch (e) { return []; }
+  }
+  function markEndingSeen(id) {
+    if (window.SYNC) { SYNC.markSeen(id); return; }
+    try {
+      const set = seenEndings();
+      if (!set.includes(id)) { set.push(id); localStorage.setItem(SEEN_KEY, JSON.stringify(set)); }
+    } catch (e) {}
+  }
   function load() {
     try {
       const raw = localStorage.getItem("sengoku_save");
@@ -253,6 +267,6 @@ window.STATE = (function () {
     fresh, get, applyStatus, applyTool, applyEffects,
     effStat, totalLuck, compMod, addCompanion, hasItem, consumeItem,
     eligibleEncounters, eligibleRests, eligibleIntros,
-    checkEndings, save, load, hasSave,
+    checkEndings, save, load, hasSave, seenEndings, markEndingSeen,
   };
 })();

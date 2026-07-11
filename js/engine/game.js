@@ -290,22 +290,49 @@ window.GAME = (function () {
   function showEnding(end) {
     const S = STATE.get();
     S.phase = "ending"; S.ended = end;
+    STATE.markEndingSeen(end.id);
     UI.log("═══ " + end.title + " ═══", "header");
     UI.log(end.text, end.tone === "bad" ? "bad" : (end.tone === "good" || end.tone === "great") ? "good" : "story");
-    UI.sfx.end();
     UI.renderSheet();
     UI.setTitle(end.title);
     UI.setSub("Your road has reached its end.");
-    const comps = S.companions.map(id => DATA.companions[id].name).join(", ") || "none";
+
+    const comps = S.companions.map(id => DATA.companions[id].name).join(", ") || "—";
+    const items = S.inventory.length ? S.inventory.join(", ") : "—";
+    const artSvg = window.SCENE ? SCENE.endingArt(end, S) : "";
+    // The <img> looks for a real illustration at assets/endings/<id>.(png|jpg|webp).
+    // Until one is dropped in, it fails to load and the drawn placeholder shows.
+    const imgTry =
+      `<img class="ending-art-img" alt="" ` +
+      `src="assets/endings/${end.id}.png" ` +
+      `onload="this.classList.add('loaded')" ` +
+      `onerror="var s='assets/endings/${end.id}.';` +
+      `if(this.dataset.t==='png'){this.dataset.t='jpg';this.src=s+'jpg';}` +
+      `else if(this.dataset.t==='jpg'){this.dataset.t='webp';this.src=s+'webp';}` +
+      `else{this.remove();}" data-t="png">`;
+
     const body =
-      `<p class="ending-tone-${end.tone}">${end.text}</p><hr>` +
-      `<p class="sm">Station — ${S.status ? S.status.name : "—"}</p>` +
-      `<p class="sm">Carried — ${S.tool ? S.tool.name : "—"}</p>` +
-      `<p class="sm">Steps walked — ${S.steps} &nbsp;·&nbsp; Health — ${Math.max(0, S.hp)}/${S.maxhp}</p>` +
-      `<p class="sm">Companions — ${comps}</p>`;
-    UI.modal("The Wheel Comes to Rest", body, "Walk a new road", newGame);
+      `<p class="ending-desc ending-tone-${end.tone}">${end.text}</p>` +
+      `<div class="ending-art">${artSvg}${imgTry}` +
+        `<span class="ending-art-tag">illustration placeholder</span></div>` +
+      `<div class="ending-stats">` +
+        statRow("Station", S.status ? S.status.name : "—") +
+        statRow("Carried", S.tool ? S.tool.name : "—") +
+        statRow("Purpose", UI.questLabel(S.quest)) +
+        statRow("Health", `${Math.max(0, S.hp)} / ${S.maxhp}`) +
+        statRow("Strength · Wisdom · Charisma", `${S.str} · ${S.wis} · ${S.cha}`) +
+        statRow("Companions", comps) +
+        statRow("Carrying", items) +
+        statRow("Steps walked", String(S.steps)) +
+        statRow("Fate", end.title) +
+      `</div>`;
+    UI.modal("The Wheel Comes to Rest", body, "Walk a new road", newGame, "modal-ending");
     UI.setAction("◈ New Journey", newGame);
     try { localStorage.removeItem("sengoku_save"); } catch (e) {}
+  }
+  function statRow(k, v) {
+    return `<div class="ending-stat"><span class="ending-stat-k">${k}</span>` +
+      `<span class="ending-stat-v">${v}</span></div>`;
   }
 
   /* ---- helpers --------------------------------------------------------- */
