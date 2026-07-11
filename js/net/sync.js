@@ -46,7 +46,8 @@ window.SYNC = (function () {
   async function req(method, path, body) {
     const opt = { method, headers: {} };
     if (body) { opt.headers["Content-Type"] = "application/json"; opt.body = JSON.stringify(body); }
-    const r = await withTimeout(fetch(base() + path, opt), 6000);
+    // generous timeout so a Render free-tier cold start (it sleeps when idle) still lands
+    const r = await withTimeout(fetch(base() + path, opt), 15000);
     if (!r.ok) throw new Error("http " + r.status);
     return r.json();
   }
