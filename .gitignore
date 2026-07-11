@@ -4,4 +4,16 @@ Thumbs.db
 *.swp
 .idea/
 .vscode/
+
+# Node / backend
 node_modules/
+server/node_modules/
+npm-debug.log*
+*.log
+
+# Backend runtime data & tooling
+server/data.json
+.wrangler/
+
+# Build output (none by default — game is static)
+dist/
