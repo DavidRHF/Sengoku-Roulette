@@ -1,0 +1,17 @@
+{
+  "name": "sengoku-sync-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tiny sync backend for Sengoku no Wa — stores discovered endings per player code.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}
