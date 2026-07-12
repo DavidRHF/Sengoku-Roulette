@@ -13,6 +13,7 @@ cover-fit into the frame). Match the game's flat ukiyo-e look if you like.
 The ending ids (filename before the extension):
 
   legend.png            Legend of the Age            (great)
+  merchant_prince.png   The Merchant Prince          (great)
   unify.png             The Realm United             (great)
   satori.png            Satori                       (great)
   province_held.png     A Province Held              (good)
