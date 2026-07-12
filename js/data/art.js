@@ -9,14 +9,15 @@
  * ========================================================================== */
 window.ART = (function () {
   const P = {
-    gold:"#d9a441", gold2:"#e7c065", crim:"#b83227", jade:"#3f7d4e", teal:"#2b6e78",
-    paper:"#f2ead8", paper2:"#d9cca8", plum:"#6c4f7a", steel:"#9aa3b2", ink:"#14151f",
-    wood:"#8a5a2b", wood2:"#6b451f", bone:"#e8e0c8", blade:"#c8ccd6", skin:"#e6c9a8",
+    gold:"#c9922f", gold2:"#dcae4e", crim:"#b23a2c", jade:"#4f7d4a", teal:"#2b6e78",
+    paper:"#e0d2ad", paper2:"#cbbc94", plum:"#6c4f7a", steel:"#8791a0", ink:"#2a241b",
+    wood:"#8a5a2b", wood2:"#6b451f", bone:"#d6c8a4", blade:"#aeb6c2", skin:"#dcbf9a",
   };
   function tile(bg, body) {
     return `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" class="tile-svg" `+
-      `preserveAspectRatio="xMidYMid meet"><rect x="1" y="1" width="46" height="46" rx="9" `+
-      `fill="${bg}"/><g stroke-linejoin="round" stroke-linecap="round">${body}</g></svg>`;
+      `preserveAspectRatio="xMidYMid meet"><rect x="1.5" y="1.5" width="45" height="45" rx="3" `+
+      `fill="#efe6cf"/><rect x="1.5" y="1.5" width="45" height="45" rx="3" fill="none" `+
+      `stroke="#2a241b" stroke-width="2"/><g stroke-linejoin="round" stroke-linecap="round">${body}</g></svg>`;
   }
 
   /* ---------------------------- ITEM ART -------------------------------- */
