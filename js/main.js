@@ -27,12 +27,7 @@
       UI.modal("Begin anew?", "<p>Abandon the current road and spin a fresh fate?</p>",
         "Yes, a new road", () => GAME.newGame());
     };
-    $("btn-endings").onclick = () => {
-      UI.sfx.click();
-      UI.modal("Endings — the Fates You've Met", UI.endingsGallery(), "Close", null, "modal-gallery");
-      wireSync();
-      if (window.SYNC && SYNC.configured()) SYNC.pull().then(refreshGallery);
-    };
+    $("btn-endings").onclick = () => { UI.sfx.click(); openGallery(); };
     $("btn-how").onclick = () => { UI.sfx.click(); UI.modal("How to Play", HOW_TO, "To the road"); };
 
     if (window.SCENE) SCENE.reset();
@@ -55,9 +50,26 @@
 
   /* ---- endings-gallery cloud-sync controls ---------------------------- */
   function setSyncStatus(m) { const s = document.getElementById("sync-status"); if (s) s.textContent = m; }
+  function openGallery() {
+    UI.modal("Endings — the Fates You've Met", UI.endingsGallery(), "Close", null, "modal-gallery");
+    wireSync(); wireCards();
+    if (window.SYNC && SYNC.configured()) SYNC.pull().then(refreshGallery);
+  }
   function refreshGallery() {
     const body = document.getElementById("modal-body");
-    if (body) { body.innerHTML = UI.endingsGallery(); wireSync(); }
+    if (body) { body.innerHTML = UI.endingsGallery(); wireSync(); wireCards(); }
+  }
+  function openEndingDetail(id) {
+    const body = document.getElementById("modal-body");
+    if (!body) return;
+    body.innerHTML = UI.endingDetail(id);
+    const back = document.getElementById("ending-back");
+    if (back) back.onclick = () => { UI.sfx.click(); openGallery(); };
+  }
+  function wireCards() {
+    document.querySelectorAll("#modal-body .ending-card.clickable").forEach(card => {
+      card.onclick = () => { UI.sfx.click(); openEndingDetail(card.getAttribute("data-ending")); };
+    });
   }
   function wireSync() {
     if (!window.SYNC) return;
