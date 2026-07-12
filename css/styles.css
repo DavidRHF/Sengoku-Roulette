@@ -190,6 +190,8 @@ body{
 .modal-body li{margin:4px 0;}
 .modal-body hr{border:none;border-top:1px solid var(--line);margin:12px 0;}
 .modal-body .sm{font-size:.82rem;color:var(--paper-dim);margin:3px 0;}
+.v-coin{color:var(--gold);font-weight:700;}
+.ch-coin .k{color:var(--gold-soft);}
 .ending-tone-great{color:var(--gold-soft);}
 .ending-tone-good{color:var(--good);}
 .ending-tone-bad{color:var(--bad);}
@@ -222,6 +224,12 @@ body{
 .ending-card-title{font-family:'Yuji Syuku',serif;color:var(--gold);font-size:.96rem;line-height:1.2;}
 .ending-card-tone{font-size:.64rem;color:var(--gold-soft);text-transform:uppercase;letter-spacing:.07em;margin:3px 0 7px;}
 .ending-card-teaser{font-size:.75rem;color:var(--paper-dim);line-height:1.45;}
+.ending-card.clickable{cursor:pointer;transition:transform .1s ease,box-shadow .12s ease;}
+.ending-card.clickable:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.4),0 0 0 1px var(--gold);}
+.ending-card-best{margin-top:8px;font-size:.72rem;color:var(--gold-soft);font-weight:700;}
+.ending-card-best.dim{color:var(--paper-dim);font-weight:400;}
+.best-head{font-size:.9rem;color:var(--gold-soft);margin:2px 0 10px;}
+.best-head.dim{color:var(--paper-dim);line-height:1.5;font-weight:400;}
 .ending-card.locked{padding:0;border-color:#20223a;}
 .ending-cloud{width:100%;height:100%;min-height:104px;display:block;}
 .locked-title{position:absolute;left:0;right:0;bottom:9px;text-align:center;color:#4a4d66;
