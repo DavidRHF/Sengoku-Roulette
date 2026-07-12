@@ -38,6 +38,10 @@ window.UI = (function () {
       else if (n.t === "maxhp") { log(`✦ Your vigor deepens (+${n.v} max health).`, "gain"); }
       else if (n.t === "item") { log(`✦ Gained: ${n.v}.`, "gain"); }
       else if (n.t === "consume") { log(`✦ You give up: ${n.v}.`, "loss"); }
+      else if (n.t === "coin") {
+        if (n.v > 0) log(`✦ You gain ${n.v} coin.`, "gain");
+        else if (n.v < 0) log(`✦ You spend ${-n.v} coin.`, "loss");
+      }
       else if (n.t === "comp") { log(`✦ ${n.v} joins your journey.`, "gain"); }
       else if (n.t === "rmcomp") { log(`✦ ${n.v} parts from you.`, "loss"); }
       else if (n.t === "quest") { log(`✦ Your destiny turns — you now walk the road of ${questLabel(n.v)}.`, "quest"); sfx.good(); }
@@ -66,6 +70,8 @@ window.UI = (function () {
     $("ch-tool").textContent = S.tool ? S.tool.name : "—";
     $("ch-quest").textContent = S.quest ? questLabel(S.quest) : "—";
     $("ch-loc").textContent = DATA.locations[S.loc] ? DATA.locations[S.loc].name : "—";
+    const coinEl = $("ch-coin");
+    if (coinEl) coinEl.textContent = (S.status ? S.coin : "—") + (S.status ? " mon" : "");
     bar("hp", S.hp, S.maxhp);
     bar("str", S.str, 20);
     bar("wis", S.wis, 20);
@@ -186,10 +192,13 @@ window.UI = (function () {
     for (const e of all) {
       if (seen.has(e.id)) {
         const teaser = (e.text || "").split(/(?<=[.!?])\s/)[0].slice(0, 120);
-        cards += `<div class="ending-card ending-tone-${e.tone}">` +
+        const best = STATE.bestRun ? STATE.bestRun(e.id) : null;
+        const bestTag = best ? `<div class="ending-card-best">Best: ${best.steps} spins ▸</div>`
+          : `<div class="ending-card-best dim">tap for details ▸</div>`;
+        cards += `<div class="ending-card clickable ending-tone-${e.tone}" data-ending="${e.id}">` +
           `<div class="ending-card-title">${e.title}</div>` +
           `<div class="ending-card-tone">${toneWord(e.tone)}</div>` +
-          `<div class="ending-card-teaser">${teaser}</div></div>`;
+          `<div class="ending-card-teaser">${teaser}</div>${bestTag}</div>`;
       } else {
         cards += `<div class="ending-card locked">${cloudSVG()}` +
           `<div class="ending-card-title locked-title">? ? ?</div></div>`;
@@ -221,9 +230,38 @@ window.UI = (function () {
       : t === "bad" ? "A grim end" : "An end";
   }
 
+  // detail view for one discovered ending: its telling + your fastest run's sheet
+  function endingDetail(id) {
+    const e = (DATA.endings || []).find(x => x.id === id);
+    if (!e) return "";
+    const best = STATE.bestRun ? STATE.bestRun(id) : null;
+    const art = window.SCENE ? SCENE.endingArt(e, STATE.get()) : "";
+    let sheet;
+    if (best) {
+      const row = (k, v) => `<div class="ending-stat"><span class="ending-stat-k">${k}</span><span class="ending-stat-v">${v}</span></div>`;
+      sheet = `<div class="best-head">Your fastest run to this ending — <b>${best.steps} spins</b></div>` +
+        `<div class="ending-stats">` +
+        row("Station", best.status) + row("Carried", best.tool) + row("Purpose", best.quest) +
+        row("Health", `${best.hp} / ${best.maxhp}`) +
+        row("Strength · Wisdom · Charisma", `${best.str} · ${best.wis} · ${best.cha}`) +
+        row("Coin", `${best.coin != null ? best.coin : "—"} mon`) +
+        row("Companions", (best.comps && best.comps.length) ? best.comps.join(", ") : "—") +
+        row("Carrying", (best.items && best.items.length) ? best.items.join(", ") : "—") +
+        `</div>`;
+    } else {
+      sheet = `<div class="best-head dim">No run recorded on this browser yet — ` +
+        `you may have reached it on another device. Reach it here to log your fastest run.</div>`;
+    }
+    return `<button class="sync-btn" id="ending-back">◂ Back to all endings</button>` +
+      `<h3 class="detail-name" style="margin-top:12px">${e.title}</h3>` +
+      `<div class="ending-card-tone">${toneWord(e.tone)}</div>` +
+      `<div class="ending-art">${art}<span class="ending-art-tag">illustration placeholder</span></div>` +
+      `<p class="detail-desc" style="text-align:left">${e.text}</p><hr>` + sheet;
+  }
+
   return {
     setTitle, setSub, setAction, hideAction, showAction,
     log, logNotes, rebuildJournal, renderSheet, modal, sfx, questLabel,
-    endingsGallery, cloudSVG,
+    endingsGallery, endingDetail, cloudSVG,
   };
 })();
