@@ -19,22 +19,22 @@
  * ========================================================================== */
 window.SCENE = (function () {
   const C = {
-    ink:"#12131f",
-    fuji:"#b9c3da", fujiDark:"#8b97b4", snow:"#f2f5fb", snowShade:"#d9e0ee",
-    hill:"#2b3350", hill2:"#343d5e",
-    ground:"#b1895c", groundDk:"#936f45", groundLine:"#7d5c38",
-    wood:"#7a5230", wood2:"#5c3c20",
-    tent:"#9c6a38", tentDk:"#6f471f", tentDoor:"#241610",
-    pine:"#2f5a3e", pineDk:"#234631", pineTrunk:"#6b4a2b",
-    flame:"#e0792b", flame2:"#f4c145", glow:"#e08a3a",
-    robe:"#37507a", robeWarrior:"#3a4a6b", robeNoble:"#5a4472", robeRelig:"#b98a3a",
-    robeCrim:"#2b2b3a", robeMerch:"#3f6e4e", robeLow:"#6b4a2b", robeHurt:"#5a5164",
-    skin:"#e6c9a8", straw:"#c8a45c",
-    gold:"#d4a24b", goldSoft:"#e6c684", paper:"#efe6d2", crimson:"#b83227",
-    sea:"#2f5a6e", seaLt:"#3f7186", foam:"#cfe3ea",
-    paddy:"#6f8f4a", pagoda:"#6b3f2a", pagodaRoof:"#3a3242",
-    torii:"#b83227", lantern:"#d9b96a", moon:"#eef2f6", star:"#f2f5fb",
-    rain:"#9fb3c8", blade:"#c8ccd6", banner:"#efe6d2", jade:"#3f7d4e",
+    ink:"#2a241b",
+    fuji:"#e2e8ee", fujiDark:"#7c9ab5", snow:"#f4efe0", snowShade:"#cdd9e6",
+    hill:"#8ea9c2", hill2:"#a3bacf",
+    ground:"#d8c191", groundDk:"#c2a970", groundLine:"#a98f57",
+    wood:"#8a5f34", wood2:"#5c3c20",
+    tent:"#a9743c", tentDk:"#6f471f", tentDoor:"#3a2412",
+    pine:"#4f6f3f", pineDk:"#3a5730", pineTrunk:"#6b4a2b",
+    flame:"#d9772a", flame2:"#f0b03e", glow:"#e0902f",
+    robe:"#3a5a86", robeWarrior:"#2f4a6e", robeNoble:"#6e5488", robeRelig:"#c39a3a",
+    robeCrim:"#2b3340", robeMerch:"#4f7d4a", robeLow:"#7a5230", robeHurt:"#8a7f70",
+    skin:"#e8cfa8", straw:"#d8b968",
+    gold:"#b8912f", goldSoft:"#d8b968", paper:"#efe6cf", crimson:"#b23a2c",
+    sea:"#274b78", seaLt:"#3f6ea0", foam:"#eef2ea",
+    paddy:"#7a9a4a", pagoda:"#7c4a2c", pagodaRoof:"#4a4048",
+    torii:"#b23a2c", lantern:"#d8b968", moon:"#f4efe0", star:"#f4efe0",
+    rain:"#7c93ad", blade:"#b8bfc9", banner:"#efe6cf", jade:"#4f7d4a",
   };
   const W = 300, H = 210, HZ = 150, GY = 188;
 
@@ -63,10 +63,10 @@ window.SCENE = (function () {
   /* ---------------- sky + celestial ------------------------------------ */
   function sky(time){
     const map = {
-      dawn:["#3a3a5c","#6a5a74","#d59a6b"],
-      day: ["#2f5f8f","#5b86ad","#bcd0e0"],
-      dusk:["#33263f","#7a3f52","#c25a3a"],
-      night:["#0b1230","#182449","#2b3a63"],
+      dawn:["#d9c3a8","#e8d9bd","#efe6cf"],
+      day: ["#c6d8dd","#e2e0cf","#efe6cf"],
+      dusk:["#dcae7e","#e6b98c","#d98f5a"],
+      night:["#3a4a68","#6b7a92","#aab2bd"],
     };
     const [a,b,c] = map[time] || map.day;
     let s = `<defs><linearGradient id="scSky" x1="0" y1="0" x2="0" y2="1">`+
@@ -77,17 +77,17 @@ window.SCENE = (function () {
       `<stop offset="1" stop-color="${C.glow}" stop-opacity="0"/></radialGradient></defs>`;
     s += `<rect x="0" y="0" width="${W}" height="${H}" fill="url(#scSky)"/>`;
     if(time==="night"){
-      s += `<circle cx="232" cy="46" r="15" fill="${C.moon}"/>`+
+      s += `<circle cx="232" cy="46" r="15" fill="${C.moon}" stroke="${C.ink}" stroke-width="1"/>`+
            `<circle cx="238" cy="42" r="15" fill="${map[time][0]}"/>`; // crescent
       for(let i=0;i<14;i++){ const x=12+rnd(i+1)*276, y=12+rnd(i+9)*90;
-        s += `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${(rnd(i)*0.9+0.4).toFixed(1)}" fill="${C.star}" opacity="0.8"/>`; }
+        s += `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${(rnd(i)*0.9+0.4).toFixed(1)}" fill="${C.foam}" opacity="0.8"/>`; }
     } else {
       const sy = time==="dusk" ? 92 : time==="dawn" ? 74 : 44;
-      s += `<circle cx="232" cy="${sy}" r="19" fill="${C.crimson}" opacity="0.5"/>`+
-           `<circle cx="232" cy="${sy}" r="14" fill="${time==="day"?"#f2c14e":C.crimson}"/>`;
+      s += `<circle cx="232" cy="${sy}" r="18" fill="${C.crimson}" stroke="${C.ink}" stroke-width="1"/>`+
+           `<circle cx="227" cy="${sy-4}" r="5" fill="${C.foam}" opacity="0.5"/>`;
     }
-    // drifting cloud bands
-    s += `<g fill="${C.paper}" opacity="0.12">`+
+    // soft woodblock cloud bands (pale blue on cream)
+    s += `<g fill="#c4d3df" opacity="0.5">`+
       `<path d="M6 70q20-8 40 0t40 0 40 0q-20 8-40 0t-40 0-40 0z"/>`+
       `<path d="M150 40q18-7 36 0t36 0q-18 7-36 0t-36 0z"/></g>`;
     return s;
@@ -522,12 +522,12 @@ window.SCENE = (function () {
   }
 
   function caption(text){
-    return `<g><rect x="8" y="${H-16}" width="108" height="13" rx="2" fill="${C.ink}" opacity="0.72" stroke="${C.gold}" stroke-width="0.7"/>`+
-      `<text x="62" y="${H-6}" font-size="9" fill="${C.goldSoft}" text-anchor="middle" font-family="'Yuji Syuku','Shippori Mincho',serif">${text}</text></g>`;
+    return `<g><rect x="8" y="${H-17}" width="112" height="14" rx="1" fill="${C.crimson}" stroke="${C.ink}" stroke-width="1"/>`+
+      `<text x="64" y="${H-6}" font-size="9" fill="${C.paper}" text-anchor="middle" font-family="'Yuji Syuku','Shippori Mincho',serif">${text}</text></g>`;
   }
   function frameOverlay(){
-    const cn=(cx,cy)=>`<rect x="${cx-2.5}" y="${cy-2.5}" width="5" height="5" fill="${C.gold}" transform="rotate(45 ${cx} ${cy})"/>`;
-    return `<rect x="3" y="3" width="${W-6}" height="${H-6}" rx="4" fill="none" stroke="${C.gold}" stroke-width="1.4" opacity="0.85"/>`+
+    const cn=(cx,cy)=>`<rect x="${cx-2.5}" y="${cy-2.5}" width="5" height="5" fill="${C.crimson}" transform="rotate(45 ${cx} ${cy})"/>`;
+    return `<rect x="2.5" y="2.5" width="${W-5}" height="${H-5}" fill="none" stroke="${C.ink}" stroke-width="2"/>`+
       cn(3,3)+cn(W-3,3)+cn(3,H-3)+cn(W-3,H-3);
   }
   function place(svgStr,x,y,size){ return svgStr.replace("<svg ", `<svg x="${x}" y="${y}" width="${size}" height="${size}" `); }

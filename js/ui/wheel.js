@@ -10,8 +10,8 @@ window.WHEEL = (function () {
   const NS = "http://www.w3.org/2000/svg";
   const CX = 150, CY = 150, R = 132, RLABEL = 84;
   const PALETTE = [
-    "#b83227", "#2b6e78", "#3f7d4e", "#c58a2b",
-    "#6c4f7a", "#a35232", "#3a6f92", "#7c8b3a",
+    "#2f5a8f", "#b23a2c", "#5f7d4a", "#c9a24b",
+    "#6e5488", "#2b6e78", "#8a5a3c", "#7c8b3a",
   ];
   const DUR = 4100; // ms
 
@@ -69,10 +69,12 @@ window.WHEEL = (function () {
       acc += sizes[i];
     }
 
-    // static backing + gold ring
-    svg.appendChild(el("circle", { cx: CX, cy: CY, r: R + 8, fill: "#0c0d15" }));
-    svg.appendChild(el("circle", { cx: CX, cy: CY, r: R + 5, fill: "none",
-      stroke: "url(#goldGrad)", "stroke-width": 8 }));
+    // static backing: a printed paper disc with an ink rim + vermilion inner ring
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: R + 8, fill: "#e3d4b4" }));
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: R + 6, fill: "none",
+      stroke: "#2a241b", "stroke-width": 3 }));
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: R + 1.5, fill: "none",
+      stroke: "#b23a2c", "stroke-width": 1.5 }));
 
     // rotating wedges (colours only — no text lives in here)
     wedgeGroup = el("g", { id: "wheel-rot" });
@@ -82,7 +84,7 @@ window.WHEEL = (function () {
       wedgeGroup.appendChild(el("path", {
         d: arcPath(wedges[i].a0, wedges[i].a1),
         fill: PALETTE[i % PALETTE.length],
-        stroke: "#1a1620", "stroke-width": 1.5,
+        stroke: "#2a241b", "stroke-width": 2,
       }));
     }
 
@@ -106,13 +108,14 @@ window.WHEEL = (function () {
       labels.push({ el: t, tspans, mid, nLines: lines.length, fs: fontSize });
     }
 
-    // hub + ensō (static, drawn on top)
-    svg.appendChild(el("circle", { cx: CX, cy: CY, r: 22, fill: "#0e0f18",
-      stroke: "url(#goldGrad)", "stroke-width": 3 }));
+    // hub + ensō (static, drawn on top) — cream disc, sumi-ink brush ring
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: 22, fill: "#efe6cf",
+      stroke: "#2a241b", "stroke-width": 2.5 }));
     svg.appendChild(el("path", {
       d: "M 150 134 A 16 16 0 1 1 141 137",
-      fill: "none", stroke: "#b83227", "stroke-width": 3.5, "stroke-linecap": "round",
+      fill: "none", stroke: "#2a241b", "stroke-width": 3.5, "stroke-linecap": "round",
     }));
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: 4.5, fill: "#b23a2c" }));
 
     layoutLabels(0);
   }
