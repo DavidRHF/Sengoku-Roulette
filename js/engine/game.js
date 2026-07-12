@@ -45,6 +45,10 @@ window.GAME = (function () {
     if (boosted) s += ` · your ${boosted.boostItem} widens “${boosted.label}”`;
     const unlocked = opts && opts.find(o => o.needItem && STATE.hasItem(o.needItem));
     if (unlocked) s += ` · your ${unlocked.needItem} opens “${unlocked.label}”`;
+    const paid = opts && opts.find(o => o.costCoin || o.needCoin);
+    if (paid) s += ` · coin can buy “${paid.label}”`;
+    const rich = opts && opts.find(o => o.coinBoost && STATE.get().coin >= o.coinBoost.min);
+    if (rich) s += ` · your purse widens “${rich.label}”`;
     return s;
   }
 
@@ -135,15 +139,24 @@ window.GAME = (function () {
   // build the option set for any spin: hides item-gated options you can't use,
   // applies item bias, computes true weights, picks the winner.
   function buildSpin(spin) {
+    const S = STATE.get();
     const stat = spin.stat;
     const eff = STATE.effStat(stat);
     const luck = STATE.totalLuck();
-    let opts = spin.options.filter(o => !(o.needItem && !STATE.hasItem(o.needItem)));
+    let opts = spin.options.filter(o => {
+      if (o.needItem && !STATE.hasItem(o.needItem)) return false;
+      // can't afford it → the option isn't on the wheel at all
+      if (o.needCoin && S.coin < o.needCoin) return false;
+      if (o.costCoin && S.coin < o.costCoin) return false;
+      return true;
+    });
     if (opts.length < 1) opts = spin.options;
     const bias = opts.map(o => {
       let m = 1;
       if (o.boostItem && STATE.hasItem(o.boostItem)) m *= (o.boostAmt || 2.6);
       if (o.dampItem && STATE.hasItem(o.dampItem)) m *= (o.dampAmt || 0.4);
+      // a full purse fattens bribes, purchases, and other coin-swayed options
+      if (o.coinBoost && S.coin >= o.coinBoost.min) m *= (o.coinBoost.amt || 2.2);
       return m;
     });
     const weights = RNG.optionWeights(opts, stat, eff == null ? 0 : eff, luck, bias);
@@ -291,13 +304,22 @@ window.GAME = (function () {
     const S = STATE.get();
     S.phase = "ending"; S.ended = end;
     STATE.markEndingSeen(end.id);
+    const comps = S.companions.map(id => DATA.companions[id].name);
+    // record this run as the best (fastest) for this ending, if it is
+    STATE.recordRun(end.id, {
+      steps: S.steps, status: S.status ? S.status.name : "—", tool: S.tool ? S.tool.name : "—",
+      quest: UI.questLabel(S.quest), hp: Math.max(0, S.hp), maxhp: S.maxhp,
+      str: S.str, wis: S.wis, cha: S.cha, coin: S.coin,
+      comps: comps.slice(), items: S.inventory.slice(), tone: end.tone,
+      when: Date.now(),
+    });
     UI.log("═══ " + end.title + " ═══", "header");
     UI.log(end.text, end.tone === "bad" ? "bad" : (end.tone === "good" || end.tone === "great") ? "good" : "story");
     UI.renderSheet();
     UI.setTitle(end.title);
     UI.setSub("Your road has reached its end.");
 
-    const comps = S.companions.map(id => DATA.companions[id].name).join(", ") || "—";
+    const compStr = comps.join(", ") || "—";
     const items = S.inventory.length ? S.inventory.join(", ") : "—";
     const artSvg = window.SCENE ? SCENE.endingArt(end, S) : "";
     // The <img> looks for a real illustration at assets/endings/<id>.(png|jpg|webp).
@@ -321,7 +343,8 @@ window.GAME = (function () {
         statRow("Purpose", UI.questLabel(S.quest)) +
         statRow("Health", `${Math.max(0, S.hp)} / ${S.maxhp}`) +
         statRow("Strength · Wisdom · Charisma", `${S.str} · ${S.wis} · ${S.cha}`) +
-        statRow("Companions", comps) +
+        statRow("Coin", `${S.coin} mon`) +
+        statRow("Companions", compStr) +
         statRow("Carrying", items) +
         statRow("Steps walked", String(S.steps)) +
         statRow("Fate", end.title) +
