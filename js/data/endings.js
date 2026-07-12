@@ -7,7 +7,7 @@
  *  a real journey — but a few can trigger early. A forced epilogue at the step
  *  cap guarantees every road ends.
  *
- *  S = { statusId, quest, circles[], hp, maxhp, steps, str,wis,cha,
+ *  S = { statusId, quest, circles[], hp, maxhp, steps, str,wis,cha, coin,
  *        has(flag)->bool, hasComp(id)->bool, compCount, itemCount,
  *        loot (count of coin/loot items), locType }
  * ========================================================================== */
@@ -56,8 +56,12 @@ DATA.endings = [
     check:S => (S.quest==="enlighten"||S.quest==="omen"||S.circles.includes("religious")) && S.steps>=11 && (S.has("centered")||S.has("hermit_taught")||S.has("tengu_lesson")||S.has("laid_to_rest")),
     text:"On an ordinary morning, on an ordinary road, it simply arrives: the seeing-through. The war-torn world does not change, but your grip on it opens like a hand. You walk on, and the road and the walker are, for once, the same thing." },
 
+  { id:"merchant_prince", title:"The Merchant Prince", priority:118, tone:"great",
+    check:S => S.coin>=140 && S.steps>=10,
+    text:"You did not win the realm with a sword — you bought it. Warehouses in every port, debts owed by half the daimyō, a private army paid in silver. In an age that spends lives like copper, you learned the deeper truth: the one who holds the coin holds the swords, and the lords, and the age itself." },
+
   { id:"fortune_made", title:"A Fortune Made", priority:100, tone:"good",
-    check:S => S.quest==="fortune" && S.steps>=8 && S.loot>=2,
+    check:S => S.quest==="fortune" && S.steps>=8 && S.coin>=60,
     text:"The gamble pays. Coin becomes goods becomes contacts becomes coin again, faster than you can spend it. You buy a warehouse, then a name, then a measure of the one thing money can rent in this age: safety. The road brought you here — and now you can afford to leave it." },
 
   { id:"duty_done", title:"Duty Discharged", priority:100, tone:"good",

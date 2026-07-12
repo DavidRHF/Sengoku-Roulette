@@ -24,7 +24,7 @@ DATA.encounters = [
     scene:{ text:"Three nobushi step from the pines, blades bared. 'A toll,' the leader grins, 'for the safety of the road we ourselves endanger.'",
       spin:{ prompt:"How do you answer the brigands?", stat:"str",
         options:[
-          { label:"Fight through", weight:10, valence:"good", text:"Your blade speaks first and last. Two flee; one does not rise. You take his coin.", hp:-6, item:"Bandit's purse" },
+          { label:"Fight through", weight:10, valence:"good", text:"Your blade speaks first and last. Two flee; one does not rise. You take his coin.", hp:-6, coin:9, item:"Bandit's purse" },
           { label:"Cut them down", weight:8, valence:"bad", text:"They were more than they looked. A spear-butt cracks your skull, and you wake with your hands bound behind you.", hp:-6, predicament:"ransom" },
           { label:"Pay the toll", weight:9, valence:"neutral", text:"You hand over coin and swallow your pride. They let you pass, laughing.", hp:0 },
           { label:"Talk past", weight:7, valence:"good", text:"You name a warlord they fear and imply his patronage. They melt back into the trees.", hp:0 },
@@ -46,7 +46,7 @@ DATA.encounters = [
       spin:{ prompt:"How do you pass inspection?", stat:"cha",
         options:[
           { label:"Present sealed papers", weight:16, valence:"good", needItem:"Travel papers", text:"You lay your sealed travel-papers on the table. The captain reads, straightens, and waves you through with a respectful bow.", consume:null },
-          { label:"Show your authority", weight:9, valence:"good", boostItem:"Seal of office", boostAmt:3.2, text:"A glimpse of your seal changes everything. The guards nearly trip bowing you through.", flag:"road_news" },
+          { label:"Show your authority", weight:9, valence:"good", boostItem:"Seal of office", boostAmt:3.2, text:"A glimpse of your seal changes everything. The guards nearly trip bowing you through.", coin:12, flag:"road_news" },
           { label:"Present papers", weight:8, valence:"good", text:"Your bearing and story satisfy them. They wave you through with a bow.", hp:0 },
           { label:"Talk your way through", weight:7, valence:"good", boostItem:"Coin purse", boostAmt:2.2, text:"A joke, a small gift, a flattered captain. The gate opens.", hp:0, item:"Traveler's pass" },
           { label:"Bluster", weight:8, valence:"bad", text:"They dislike your tone. Then someone recognizes your face from the wanted-book, and hands close on your arms.", predicament:"jail" },
@@ -403,7 +403,7 @@ DATA.encounters = [
     scene:{ text:"A tax-storehouse, fat with hoarded rice while the district starves. Guards doze at a barred side-door. Opportunity, and risk.",
       spin:{ prompt:"How do you get inside?", stat:"wis",
         options:[
-          { label:"Smoke and shadow", weight:12, valence:"good", needItem:"Smoke bombs", text:"A hiss of smoke, a swift climb, and you are past the choking guards. You leave with a purse and a sack of rice for the district.", consume:"Smoke bombs", item:"Storehouse takings", flag:"beloved" },
+          { label:"Smoke and shadow", weight:12, valence:"good", needItem:"Smoke bombs", text:"A hiss of smoke, a swift climb, and you are past the choking guards. You leave with a purse and a sack of rice for the district.", consume:"Smoke bombs", coin:14, item:"Storehouse takings", flag:"beloved" },
           { label:"Pick the lock", weight:8, valence:"good", boostItem:"Grappling hook", boostAmt:2.0, text:"Patient fingers beat the old lock. You take what you can carry and melt away.", item:"Storehouse takings" },
           { label:"Bluff the guards", weight:7, valence:"neutral", text:"You pose as an inspector. It half-works; you leave empty-handed but unremembered.", hp:0 },
           { label:"Force the door", weight:7, valence:"bad", text:"Wood splinters loud in the night. Torches bloom, spears level, and the district watch drags you down.", hp:-6, predicament:"jail" },
@@ -413,7 +413,7 @@ DATA.encounters = [
     scene:{ text:"A red-faced ronin slams down his cup and challenges the room. Wagers pile up. The crowd chants for a champion.",
       spin:{ prompt:"Do you take the challenge?", stat:"cha",
         options:[
-          { label:"Match him cup for cup", weight:10, valence:"good", boostItem:"Sake flask", boostAmt:2.6, text:"Your seasoned liver wins the day and the pot. The beaten ronin laughs and buys the next round himself.", item:"Wager winnings", consume:"Sake flask" },
+          { label:"Match him cup for cup", weight:10, valence:"good", boostItem:"Sake flask", boostAmt:2.6, text:"Your seasoned liver wins the day and the pot. The beaten ronin laughs and buys the next round himself.", coin:13, item:"Wager winnings", consume:"Sake flask" },
           { label:"Cheat with water", weight:7, valence:"good", text:"You bribe the pourer to water your cups. You 'win' clear-headed, richer, and only a little ashamed.", item:"Wager winnings" },
           { label:"Bow out", weight:7, valence:"neutral", text:"You know your limits. The crowd jeers, briefly, then forgets you.", hp:0 },
           { label:"Drink to ruin", weight:8, valence:"bad", text:"Pride outlasts sense. You wake in a gutter, purse gone, head splitting.", hp:-7 },
@@ -495,7 +495,7 @@ DATA.encounters = [
     scene:{ text:"A drunk factor, thinking you a partner, lets slip a route: a river-gold strike, a starving daimyō desperate to sell, a fortune for whoever moves first.",
       spin:{ prompt:"Chase the fortune?", stat:"wis",
         options:[
-          { label:"Bet everything on it", weight:9, valence:"good", boostItem:"Coin purse", boostAmt:2.2, quest:"fortune", text:"You commit. From this day your road bends toward coin, cargo, and the sweet arithmetic of profit.", item:"Seed capital" },
+          { label:"Bet everything on it", weight:9, valence:"good", boostItem:"Coin purse", boostAmt:2.2, quest:"fortune", text:"You commit. From this day your road bends toward coin, cargo, and the sweet arithmetic of profit.", coin:16, item:"Seed capital" },
           { label:"Verify, then invest", weight:7, valence:"good", boostItem:"Trade ledger", boostAmt:2.0, quest:"fortune", text:"You check the story against your ledger before leaping. It holds. The venture — and your new purpose — is launched.", flag:"road_news" },
           { label:"Dismiss it as a lie", weight:7, valence:"neutral", text:"You have heard a hundred such tales. You let this one pass with the drunk who told it.", hp:0 },
         ] } } },
@@ -550,7 +550,7 @@ DATA.encounters = [
       spin:{ prompt:"Avoid the muster?", stat:"cha",
         options:[
           { label:"Talk your way past", weight:9, valence:"good", boostItem:"Travel papers", boostAmt:2.4, text:"Papers, a title, a lord's name — you give him reasons enough to wave you on.", hp:0 },
-          { label:"Buy him off", weight:7, valence:"good", needItem:"Coin purse", consume:"Coin purse", text:"A coin in the sergeant's palm buys a sudden blindness. He finds another ox." },
+          { label:"Buy him off", weight:7, valence:"good", needCoin:10, costCoin:10, text:"A coin in the sergeant's palm buys a sudden blindness. He finds another ox." },
           { label:"Show your rank", weight:8, valence:"good", boostItem:"Clan crest", boostAmt:2.4, text:"Your crest turns the sergeant's greed to a hasty bow. He seeks his spears elsewhere.", hp:0 },
           { label:"Shoved into the line", weight:9, valence:"bad", text:"There is no arguing with six spears. They take your name, your freedom, and your afternoon.", predicament:"conscript" },
         ] } } },
@@ -568,7 +568,7 @@ DATA.encounters = [
     scene:{ text:"A ring of sand, a roaring shrine-crowd, and a mountain of a man beckoning you onto the dohyō. Wagers pile as high as the purse.",
       spin:{ prompt:"Take the ring?", stat:"str",
         options:[
-          { label:"Drive him out", weight:9, valence:"good", boostItem:"Ceremonial apron", boostAmt:2.8, text:"Belt to belt, you find the angle and walk him backward over the bales. The crowd erupts and coins rain.", item:"Wager winnings", flag:"beloved" },
+          { label:"Drive him out", weight:9, valence:"good", boostItem:"Ceremonial apron", boostAmt:2.8, text:"Belt to belt, you find the angle and walk him backward over the bales. The crowd erupts and coins rain.", coin:18, item:"Wager winnings", flag:"beloved" },
           { label:"Win on technique", weight:7, valence:"good", text:"You slip his charge and let his own weight throw him down. A cannier victory, and a lighter purse.", item:"Hidden coin" },
           { label:"Thrown from the ring", weight:8, valence:"bad", text:"He is a landslide with a topknot. You land in the third row, and your pride lands harder.", hp:-9 },
         ] } } },
@@ -596,7 +596,7 @@ DATA.encounters = [
     scene:{ text:"A trading junk lies heeled over on the tide-flats, its crew fled or drowned, its hold still full. And you are not the only one who has seen it from the shore.",
       spin:{ prompt:"Claim the wreck?", stat:"str",
         options:[
-          { label:"Take it by the blade", weight:9, valence:"good", boostItem:"Cutlass", boostAmt:2.6, text:"You reach the deck first and hold the plank against the others until the tide decides it. The hold is yours.", item:"Salvaged cargo" },
+          { label:"Take it by the blade", weight:9, valence:"good", boostItem:"Cutlass", boostAmt:2.6, text:"You reach the deck first and hold the plank against the others until the tide decides it. The hold is yours.", coin:15, item:"Salvaged cargo" },
           { label:"Dive the flooded hold", weight:7, valence:"good", boostItem:"Sea charm", boostAmt:1.8, text:"You go under for the good cargo while the others squabble on deck, and slip away heavy-laden.", item:"Salvaged cargo", hp:-2 },
           { label:"Caught by the tide", weight:8, valence:"bad", text:"The sea comes back faster than you reckoned. You lose your footing and half-drown clawing back to shore, empty-handed.", hp:-10 },
         ] } } },
@@ -605,8 +605,48 @@ DATA.encounters = [
     scene:{ text:"Soldiers on the road, drunk and looking for trouble — until you unsling the biwa and begin the lament of a house they all lost kin to. The road goes very quiet.",
       spin:{ prompt:"Play for your life.", stat:"cha",
         options:[
-          { label:"Sing them to tears", weight:10, valence:"good", boostItem:"Biwa lute", boostAmt:2.8, text:"By the last verse hard men are weeping openly. They press coin on you and beg you to pass in peace.", item:"Festival gifts", flag:"beloved" },
+          { label:"Sing them to tears", weight:10, valence:"good", boostItem:"Biwa lute", boostAmt:2.8, text:"By the last verse hard men are weeping openly. They press coin on you and beg you to pass in peace.", coin:10, item:"Festival gifts", flag:"beloved" },
           { label:"A safe, sombre tune", weight:8, valence:"good", text:"Not your finest, but enough. Their mood turns from menace to melancholy, and they let you go.", hp:0 },
           { label:"A sour note", weight:7, valence:"bad", text:"A cracked string, a broken spell. The drunkards remember they were looking for trouble.", hp:-7 },
+        ] } } },
+
+  { id:"market_stalls", art:"market", title:"The Market Stalls", loc:["edo","kyoto","city","outskirts","tokaido"], circles:["any"], weight:7,
+    scene:{ text:"A crossroads market, loud with hawkers. A herb-seller, a charm-pedlar, and a fixer selling stamped papers all catch your eye — for the right coin.",
+      spin:{ prompt:"Spend your coin?", stat:null,
+        options:[
+          { label:"Buy healing herbs (8)", weight:8, valence:"good", needCoin:8, costCoin:8, item:"Healing herbs", hp:6, text:"You buy a wrap of moxa and mountain herbs, and treat your road-hurts on the spot." },
+          { label:"Buy a shrine charm (6)", weight:7, valence:"good", needCoin:6, costCoin:6, item:"Kami's talisman", text:"A blessed ofuda for the road ahead. Cheap insurance against an unlucky wheel." },
+          { label:"Buy stamped papers (14)", weight:6, valence:"good", needCoin:14, costCoin:14, item:"Travel papers", text:"The fixer's seal looks real enough. Papers open a great many gates." },
+          { label:"Only browse", weight:8, valence:"neutral", text:"You finger the goods, haggle for sport, and buy nothing. Your purse, at least, is untouched.", hp:0 },
+          { label:"Pockets too light", weight:5, valence:"bad", needCoin:0, text:"The stalls have plenty; your purse does not. You move on, wanting.", hp:0 },
+        ] } } },
+
+  { id:"hire_sword", art:"bandits", title:"Blades for Hire", loc:["city","edo","kyoto","outskirts","road","tokaido"], circles:["any"], weight:6, minStep:2,
+    scene:{ text:"Outside a wineshop, masterless men lounge with their swords, waiting for someone with coin and a reason. A grizzled ronin and a young ashigaru both meet your eye.",
+      spin:{ prompt:"Hire a companion?", stat:"cha",
+        options:[
+          { label:"Hire the ronin (22)", weight:8, valence:"good", needCoin:22, costCoin:22, coinBoost:{min:60,amt:1.5}, comp:"ronin_frnd", text:"Coin changes hands. The ronin shoulders his blade and falls in beside you without a word." },
+          { label:"Hire the ashigaru (12)", weight:8, valence:"good", needCoin:12, costCoin:12, comp:"ashigaru", text:"The young spearman grins, pockets your coin, and swears his service for the season." },
+          { label:"Share a drink instead", weight:7, valence:"neutral", text:"You buy a round and trade road-news, but hire no one. Cheaper, and you leave knowing the lay of the land.", hp:1 },
+          { label:"Nothing you can afford", weight:5, valence:"bad", text:"They look at your thin purse and lose interest. Steel does not work on credit.", hp:0 },
+        ] } } },
+
+  { id:"trade_venture", art:"market", title:"A Trade Venture", loc:["city","edo","kyoto","coast","tokaido","road"], circles:["merchant","wanderer","any"], weight:6, minStep:2,
+    scene:{ text:"A factor lays out a proposition: stake coin in a cargo run through contested country. Fat returns if it lands — nothing if the bandits reach it first.",
+      spin:{ prompt:"Back the venture?", stat:"wis",
+        options:[
+          { label:"Stake a fortune (20)", weight:8, valence:"good", needCoin:20, costCoin:20, coinBoost:{min:70,amt:1.7}, coin:60, text:"The run gets through. Your stake comes back three-fold, and then some — this is how fortunes are truly made." },
+          { label:"Stake a little (8)", weight:8, valence:"good", needCoin:8, costCoin:8, coin:22, text:"A modest bet, a modest win. Safer arithmetic, but arithmetic that adds up." },
+          { label:"The run is lost", weight:7, valence:"bad", needCoin:8, costCoin:12, text:"Bandits take the cargo at a ford. Your stake vanishes with it — the risk was always real.", },
+          { label:"Keep your purse shut", weight:6, valence:"neutral", text:"You decline. No gain, but no loss, and a factor who remembers a careful partner.", hp:0 },
+        ] } } },
+
+  { id:"money_lender", art:"market", title:"The Moneylender", loc:["city","edo","kyoto","outskirts","tokaido"], circles:["any"], weight:5, minStep:3,
+    scene:{ text:"Behind a lattice sits a moneylender with a soft voice and hard eyes. Coin today, he offers, against a promise tomorrow — the kind of promise it is unwise to break.",
+      spin:{ prompt:"Take the loan?", stat:"cha",
+        options:[
+          { label:"Borrow a heavy purse", weight:8, valence:"good", coin:32, flag:"powerful_debt", text:"He counts out silver into your palm. You are richer now — and owned, a little, by a man who never forgets a debt." },
+          { label:"Borrow a modest sum", weight:8, valence:"good", coin:16, text:"A smaller loan, a lighter chain. Enough to get you over the next hard stretch." },
+          { label:"Bow and decline", weight:7, valence:"neutral", text:"You want no part of his ledger. He smiles as if he already knew, and you leave owing nothing.", hp:0 },
         ] } } },
 ];

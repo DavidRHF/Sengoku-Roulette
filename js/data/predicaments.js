@@ -23,7 +23,7 @@ DATA.predicaments = {
         text: "Iron, straw, and the stink of the men before you. A magistrate's holding-cage — and no one who knows your name knows you are here.",
         spin: { prompt: "How do you get out of this cell?", stat: "wis",
           options: [
-            { label:"Bribe the jailer", weight:11, valence:"good", needItem:"Coin purse", consume:"Coin purse", escape:true,
+            { label:"Bribe the jailer", weight:11, valence:"good", needCoin:12, costCoin:12, coinBoost:{min:30,amt:1.6}, escape:true,
               text:"You press your purse through the bars.", freeText:"A door is left unlatched at the turning of the watch. You are gone before the bell." },
             { label:"Show your seal", weight:12, valence:"good", needItem:"Seal of office", escape:true,
               text:"You demand the magistrate read your seal.", freeText:"Rank ends the matter. They all but apologize as they open the gate." },
@@ -64,7 +64,7 @@ DATA.predicaments = {
         text: "You wake bound wrist and ankle in a bandit camp. 'Someone will pay for you,' the scar-faced chief grins, tossing your own blade hand to hand, 'or the crows eat well.'",
         spin: { prompt: "How do you get free of them?", stat: "cha",
           options: [
-            { label:"Buy your own freedom", weight:11, valence:"good", needItem:"Coin purse", consume:"Coin purse", escape:true,
+            { label:"Buy your own freedom", weight:11, valence:"good", needCoin:20, costCoin:20, coinBoost:{min:40,amt:1.6}, escape:true,
               text:"You offer your purse as your own ransom.", freeText:"The chief laughs at the joke of it, takes the coin, and cuts you loose." },
             { label:"Vanish in smoke", weight:9, valence:"good", needItem:"Smoke bombs", consume:"Smoke bombs", escape:true,
               text:"You still have a charge they never found.", freeText:"White smoke, a scramble, and the mountain dark swallows you whole." },
@@ -101,7 +101,7 @@ DATA.predicaments = {
           options: [
             { label:"Desert in the night", weight:9, valence:"good", boostItem:"Smoke bombs", boostAmt:2.0, escape:true,
               text:"You wait for the sentries to drowse.", freeText:"Between one torch and the next, you melt into the dark and are gone." },
-            { label:"Buy your name off the muster", weight:9, valence:"good", needItem:"Coin purse", consume:"Coin purse", escape:true,
+            { label:"Buy your name off the muster", weight:9, valence:"good", needCoin:14, costCoin:14, escape:true,
               text:"A quiet word and a heavier purse for the sergeant.", freeText:"Your name quietly leaves the roll, and you leave the camp." },
             { label:"Distinguish yourself, then go", weight:7, valence:"good", escape:true, item:"Battlefield spoils", comp:"ashigaru",
               text:"You fight well enough in the skirmish to be noticed.", freeText:"When the field is won you are let go with spoils — and a foot-soldier who liked your nerve tags along." },
