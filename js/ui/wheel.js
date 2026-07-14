@@ -10,8 +10,8 @@ window.WHEEL = (function () {
   const NS = "http://www.w3.org/2000/svg";
   const CX = 150, CY = 150, R = 132, RLABEL = 84;
   const PALETTE = [
-    "#2f5a8f", "#b23a2c", "#5f7d4a", "#c9a24b",
-    "#6e5488", "#2b6e78", "#8a5a3c", "#7c8b3a",
+    "#4a6e97", "#bd5a4a", "#7e9268", "#cdb277",
+    "#8a749c", "#5a8791", "#9c7a5c", "#97a06a",
   ];
   const DUR = 4100; // ms
 
@@ -51,6 +51,20 @@ window.WHEEL = (function () {
     currentRot = 0;
     labels = []; wedges = [];
 
+    // woodblock paper grain + a soft centre bokashi, printed over the wedges
+    const NOISE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23n)'/%3E%3C/svg%3E";
+    const defs = el("defs", {});
+    defs.innerHTML =
+      `<pattern id="wbPaper" patternUnits="userSpaceOnUse" width="150" height="150">` +
+      `<image href="${NOISE}" x="0" y="0" width="150" height="150"/></pattern>` +
+      `<radialGradient id="wbBokashi" cx="0.5" cy="0.5" r="0.5">` +
+      `<stop offset="0" stop-color="#f4efe0" stop-opacity="0.30"/>` +
+      `<stop offset="0.62" stop-color="#f4efe0" stop-opacity="0"/></radialGradient>` +
+      `<radialGradient id="wbEdge" cx="0.5" cy="0.5" r="0.5">` +
+      `<stop offset="0.72" stop-color="#2a241b" stop-opacity="0"/>` +
+      `<stop offset="1" stop-color="#2a241b" stop-opacity="0.16"/></radialGradient>`;
+    svg.appendChild(defs);
+
     // wedge angular sizes ∝ weight (so a fatter slice = a genuinely higher
     // chance). A floor keeps tiny-odds slices readable, then we renormalise.
     const hasW = segments.some(s => typeof s.weight === "number");
@@ -87,6 +101,14 @@ window.WHEEL = (function () {
         stroke: "#2a241b", "stroke-width": 2,
       }));
     }
+    // paper grain rides WITH the print (rotates with the wedges)
+    const tex = el("circle", { cx: CX, cy: CY, r: R, fill: "url(#wbPaper)", opacity: 0.13 });
+    tex.style.mixBlendMode = "multiply";
+    wedgeGroup.appendChild(tex);
+
+    // static centre bokashi + soft rim shade (lighting, doesn't spin)
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: R, fill: "url(#wbBokashi)" }));
+    svg.appendChild(el("circle", { cx: CX, cy: CY, r: R, fill: "url(#wbEdge)" }));
 
     // upright labels (orbit the hub, never tilt)
     labelLayer = el("g", { id: "wheel-labels" });
