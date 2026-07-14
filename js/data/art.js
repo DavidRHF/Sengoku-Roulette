@@ -9,9 +9,9 @@
  * ========================================================================== */
 window.ART = (function () {
   const P = {
-    gold:"#c9922f", gold2:"#dcae4e", crim:"#b23a2c", jade:"#4f7d4a", teal:"#2b6e78",
-    paper:"#e0d2ad", paper2:"#cbbc94", plum:"#6c4f7a", steel:"#8791a0", ink:"#2a241b",
-    wood:"#8a5a2b", wood2:"#6b451f", bone:"#d6c8a4", blade:"#aeb6c2", skin:"#dcbf9a",
+    gold:"#c39a3f", gold2:"#d6ac57", crim:"#b0473a", jade:"#5e7d57", teal:"#3d7078",
+    paper:"#e0d2ad", paper2:"#cbbc94", plum:"#75607f", steel:"#8791a0", ink:"#2a241b",
+    wood:"#8a5f34", wood2:"#6b4a26", bone:"#d6c8a4", blade:"#aeb6c2", skin:"#dcbf9a",
   };
   function tile(bg, body) {
     return `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" class="tile-svg" `+
