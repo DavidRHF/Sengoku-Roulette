@@ -13,4 +13,4 @@
  *  Note: if you host the game on GitHub Pages (https), the backend URL must
  *  also be https, or the browser will block it as mixed content.
  * ========================================================================== */
-window.SENGOKU_CONFIG = { syncUrl: "https://your-app.onrender.com" };
+window.SENGOKU_CONFIG = { syncUrl: "https://sengoku-roulette.onrender.com" };
