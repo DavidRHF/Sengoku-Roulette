@@ -74,8 +74,17 @@ window.SCENE = (function () {
       `<stop offset="1" stop-color="${c}"/></linearGradient>`+
       `<radialGradient id="scGlow" cx="0.5" cy="0.5" r="0.5">`+
       `<stop offset="0" stop-color="${C.glow}" stop-opacity="0.6"/>`+
-      `<stop offset="1" stop-color="${C.glow}" stop-opacity="0"/></radialGradient></defs>`;
+      `<stop offset="1" stop-color="${C.glow}" stop-opacity="0"/></radialGradient>`+
+      `<linearGradient id="scSea" x1="0" y1="0" x2="0" y2="1">`+
+      `<stop offset="0" stop-color="#22406a"/><stop offset="0.5" stop-color="#31567f"/>`+
+      `<stop offset="1" stop-color="#4b78a4"/></linearGradient>`+
+      `<linearGradient id="scHorizon" x1="0" y1="0" x2="0" y2="1">`+
+      `<stop offset="0" stop-color="#efe6cf" stop-opacity="0"/><stop offset="1" stop-color="#efe6cf" stop-opacity="0.8"/></linearGradient>`+
+      `<linearGradient id="scSnow" x1="0" y1="0" x2="0" y2="1">`+
+      `<stop offset="0" stop-color="#f4efe0" stop-opacity="0"/><stop offset="0.6" stop-color="#f4efe0" stop-opacity="0.85"/><stop offset="1" stop-color="#dbe4ec" stop-opacity="0.95"/></linearGradient></defs>`;
     s += `<rect x="0" y="0" width="${W}" height="${H}" fill="url(#scSky)"/>`;
+    // graded cream horizon haze (bokashi), like the Great Wave sky
+    s += `<rect x="0" y="${HZ-46}" width="${W}" height="50" fill="url(#scHorizon)"/>`;
     if(time==="night"){
       s += `<circle cx="232" cy="46" r="15" fill="${C.moon}" stroke="${C.ink}" stroke-width="1"/>`+
            `<circle cx="238" cy="42" r="15" fill="${map[time][0]}"/>`; // crescent
@@ -140,7 +149,7 @@ window.SCENE = (function () {
   function paddies(){ let s=`<rect x="0" y="${HZ}" width="${W}" height="18" fill="${C.paddy}"/>`;
     s+=`<g stroke="#4f6a32" stroke-width="0.8" opacity="0.6">`;
     for(let i=0;i<10;i++) s+=`<path d="M${i*30} ${HZ+2} q15 6 30 0"/>`; s+=`</g>`; return s; }
-  function sea(){ let s=`<rect x="0" y="${HZ}" width="${W}" height="${H-HZ}" fill="${C.sea}"/>`;
+  function sea(){ let s=`<rect x="0" y="${HZ}" width="${W}" height="${H-HZ}" fill="url(#scSea)"/>`;
     s+=`<g fill="none" stroke="${C.foam}" stroke-width="1" opacity="0.5">`;
     for(let r=0;r<5;r++) for(let i=0;i<11;i++) s+=`<path d="M${i*30-10} ${HZ+8+r*10} q10 -6 20 0"/>`;
     s+=`</g>`; return s; }
@@ -158,10 +167,20 @@ window.SCENE = (function () {
         `<animateTransform attributeName="transform" type="translate" values="0 -12;0 12" dur="0.45s" repeatCount="indefinite"/>`;
       for(let i=0;i<44;i++){ const x=rnd(i)*W, y=rnd(i+5)*(H+24)-12; s+=`<line x1="${x.toFixed(0)}" y1="${y.toFixed(0)}" x2="${(x-4).toFixed(0)}" y2="${(y+11).toFixed(0)}"/>`; }
       return s+`</g>`; }
-    if(weather==="snow"){ let s=`<g fill="${C.paper}" opacity="0.85">`+
-        `<animateTransform attributeName="transform" type="translate" values="0 -14;2 14" dur="3.2s" repeatCount="indefinite"/>`;
-      for(let i=0;i<36;i++){ const x=rnd(i)*W, y=rnd(i+3)*(H+28)-14; s+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${(rnd(i)*1+0.6).toFixed(1)}"/>`; }
-      return s+`</g>`; }
+    if(weather==="snow"){
+      // graded snow settling on the foreground (bokashi)
+      let s = `<rect x="0" y="${GY-10}" width="${W}" height="${H-GY+10}" fill="url(#scSnow)"/>`;
+      // sprayed flecks — the woodblock snow speckle
+      s += `<g fill="#f6f1e4">`;
+      for(let i=0;i<48;i++){ const x=rnd(i*2+1)*W, y=rnd(i*2+7)*H; s+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${(rnd(i)*1+0.5).toFixed(1)}"/>`; }
+      s += `</g><g fill="#8b93a0" opacity="0.5">`;
+      for(let i=0;i<14;i++){ const x=rnd(i*3+2)*W, y=rnd(i*3+5)*H; s+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="0.7"/>`; }
+      s += `</g>`;
+      // gently drifting snow on top
+      s += `<g fill="${C.paper}" opacity="0.9"><animateTransform attributeName="transform" type="translate" values="0 -14;2 14" dur="3.2s" repeatCount="indefinite"/>`;
+      for(let i=0;i<30;i++){ const x=rnd(i+3)*W, y=rnd(i+3)*(H+28)-14; s+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${(rnd(i)*1+0.6).toFixed(1)}"/>`; }
+      return s+`</g>`;
+    }
     return "";
   }
 
@@ -372,7 +391,7 @@ window.SCENE = (function () {
       `<line x1="170" y1="78" x2="170" y2="128"/><line x1="200" y1="78" x2="200" y2="128"/><line x1="230" y1="78" x2="230" y2="128"/><line x1="260" y1="78" x2="260" y2="128"/></g>`+
       banner(276,GY,0.9)+person(210,GY,1.05,{robe:C.robeNoble,hat:"none",injury:0,pose:"sit"})+
       person(120,GY,1.15,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:x.inj,pose:"bow"}),
-    river:(x)=> `<rect x="0" y="${HZ}" width="${W}" height="${H-HZ}" fill="${C.sea}"/>`+
+    river:(x)=> `<rect x="0" y="${HZ}" width="${W}" height="${H-HZ}" fill="url(#scSea)"/>`+
       `<g fill="none" stroke="${C.foam}" stroke-width="1" opacity="0.5">`+
       Array.from({length:5},(_,r)=>Array.from({length:11},(_,i)=>`<path d="M${i*30-10} ${HZ+8+r*10} q10 -6 20 0"/>`).join("")).join("")+`</g>`+
       `<ellipse cx="110" cy="176" rx="10" ry="3" fill="${C.groundDk}"/><ellipse cx="150" cy="184" rx="10" ry="3" fill="${C.groundDk}"/><ellipse cx="190" cy="176" rx="10" ry="3" fill="${C.groundDk}"/>`+
@@ -419,7 +438,7 @@ window.SCENE = (function () {
       `<path d="M130 100 v6 M142 100 v6 M154 100 v6 M166 100 v6" stroke="${C.paper}" stroke-width="1.4"/>`+
       person(196,GY,1.0,{robe:C.robeLow,injury:0,pose:"fallen"})+
       person(120,GY,1.15,{robe:robeFor(x.S),hat:"kasa",tool:x.tool,injury:x.inj,pose:"bow"}),
-    harbor:(x)=> `<rect x="0" y="${HZ}" width="${W}" height="${H-HZ}" fill="${C.sea}"/>`+
+    harbor:(x)=> `<rect x="0" y="${HZ}" width="${W}" height="${H-HZ}" fill="url(#scSea)"/>`+
       `<g fill="none" stroke="${C.foam}" stroke-width="1" opacity="0.5">`+
       Array.from({length:4},(_,r)=>Array.from({length:11},(_,i)=>`<path d="M${i*30-10} ${HZ+10+r*11} q10 -6 20 0"/>`).join("")).join("")+`</g>`+
       `<g transform="translate(196,168) rotate(-8)"><path d="M-40 0 Q0 20 40 0 L30 10 Q0 18 -30 10 Z" fill="${C.wood2}"/>`+
@@ -435,7 +454,7 @@ window.SCENE = (function () {
       lantern(52,GY,1.1)+ `<rect x="40" y="${HZ}" width="${W-80}" height="3" fill="${C.groundDk}"/>`+
       person(108,GY,1.3,{robe:robeFor(x.S),hat:"none",tool:x.tool||"katana",injury:x.inj,pose:"fight"})+
       person(206,GY,1.3,{robe:"#3a2f42",hat:"none",tool:"katana",injury:0,pose:"fight",flip:true}),
-    nanban:(x)=> `<rect x="0" y="${HZ}" width="${W}" height="${H-HZ}" fill="${C.sea}"/>`+
+    nanban:(x)=> `<rect x="0" y="${HZ}" width="${W}" height="${H-HZ}" fill="url(#scSea)"/>`+
       `<g transform="translate(210,150)"><path d="M-46 20 Q0 34 46 20 L36 30 Q0 38 -36 30 Z" fill="#4a3526"/>`+
       `<rect x="-30" y="-46" width="3" height="66" fill="${C.wood}"/><rect x="10" y="-40" width="3" height="60" fill="${C.wood}"/>`+
       `<rect x="-44" y="-40" width="30" height="24" fill="${C.paper}" opacity="0.9"/><rect x="-4" y="-34" width="28" height="22" fill="${C.paper}" opacity="0.9"/>`+
@@ -495,13 +514,14 @@ window.SCENE = (function () {
   }
   function camp(ctx){
     const S = ctx.S || {};
-    let s = campBase(true);
-    // clan banner + tent mon if you bear rank/crest
+    const kind = lodgingType(S);
+    let s = pine(28, HZ+6, 1.05) + pine(272, HZ+8, 0.95);
+    s += building(kind, S);
+    // clan banner if you bear rank/crest (estates carry their mon on the roof instead)
     const c = S.circles || [];
-    const bears = c.includes("warrior")||c.includes("noble")|| (S.inventory||[]).some(i=>/crest|seal|token/i.test(i));
-    if(bears){ s += banner(268, GY, 1.0);
-      s += `<circle cx="224" cy="${GY-34}" r="4" fill="none" stroke="${C.gold}" stroke-width="1.1"/>`; }
-    // drying rack with items
+    const bears = c.includes("warrior")|| (S.inventory||[]).some(i=>/crest|seal|token/i.test(i));
+    if(bears && kind!=="estate") s += banner(268, GY, 1.0);
+    // belongings on a rack/stand
     const items = S.inventory || [];
     const x0=24, x1=104, top=HZ+2, base=GY;
     s += `<g stroke="${C.wood2}" stroke-width="1.8" stroke-linecap="round">`+
@@ -511,14 +531,102 @@ window.SCENE = (function () {
     show.forEach((name,i)=>{ const x=x0+gap*(i+1)+i*size;
       s += `<line x1="${x+size/2}" y1="${top}" x2="${x+size/2}" y2="${top+3}" stroke="${C.paper}" stroke-width="0.8"/>`;
       s += place(ART.item(name), x, top+3, size); });
-    if(items.length>4) s += `<text x="${x1-2}" y="${top+13}" font-size="9" fill="${C.paper}" text-anchor="end" font-family="'Zen Kaku Gothic New',sans-serif" font-weight="700">+${items.length-4}</text>`;
-    // companions by the fire
+    if(items.length>4) s += `<text x="${x1-2}" y="${top+13}" font-size="9" fill="${C.ink}" text-anchor="end" font-family="'Zen Kaku Gothic New',sans-serif" font-weight="700">+${items.length-4}</text>`;
+    // companions gathered
     const comps = S.companions || [];
     comps.slice(0,3).forEach((id,i)=> s += place(ART.comp(id), 120+i*22, GY-40, 20));
-    if(comps.length>3) s += `<text x="${120+3*22}" y="${GY-26}" font-size="9" fill="${C.paper}" font-family="'Zen Kaku Gothic New',sans-serif" font-weight="700">+${comps.length-3}</text>`;
-    // the traveller by the fire, holding their tool
-    s += person(96, GY, 1.15, {robe:robeFor(S), hat:"kasa", tool:ctx.tool, injury:ctx.inj});
+    if(comps.length>3) s += `<text x="${120+3*22}" y="${GY-26}" font-size="9" fill="${C.ink}" font-family="'Zen Kaku Gothic New',sans-serif" font-weight="700">+${comps.length-3}</text>`;
+    // the traveller, dressed to their station, holding their tool
+    const hat = (kind==="estate"||kind==="temple") ? "none" : "kasa";
+    s += person(96, GY, 1.15, {robe:robeFor(S), hat:hat, tool:ctx.tool, injury:ctx.inj});
     return s;
+  }
+
+  // which sort of place would THIS person actually rest at?
+  function lodgingType(S){
+    const c = (S && S.circles) || [];
+    const id = (S && S.status && S.status.id) || "";
+    const q = S && S.quest;
+    if(q==="pilgrimage" || q==="enlighten") return "temple";
+    if(c.includes("noble")) return "estate";
+    if(c.includes("religious")) return "temple";
+    if(c.includes("criminal")) return (biomeOf(S)==="coast" || /pirate/.test(id)) ? "boat" : "hideout";
+    if(c.includes("warrior")) return "warcamp";
+    if(c.includes("merchant")||c.includes("artisan")||c.includes("entertainer")) return "inn";
+    if(c.includes("low")||c.includes("peasant")) return "hut";
+    return "warcamp";
+  }
+
+  // a lit stone lantern (ishidōrō) — high-class lodgings
+  function stoneLantern(x, baseY){
+    return `<g transform="translate(${x},${baseY})" stroke="${C.ink}" stroke-width="0.8">`+
+      `<rect x="-4" y="-6" width="8" height="6" fill="#b9b0a0"/>`+
+      `<rect x="-2.5" y="-16" width="5" height="10" fill="#c8bfae"/>`+
+      `<rect x="-7" y="-24" width="14" height="8" rx="1" fill="#cfc6b2"/>`+
+      `<rect x="-4.5" y="-22.5" width="9" height="5" fill="${C.lantern}" stroke="none"><animate attributeName="opacity" values="0.7;1;0.75" dur="1.8s" repeatCount="indefinite"/></rect>`+
+      `<path d="M-8 -24 L0 -30 L8 -24 Z" fill="#b9b0a0"/></g>`;
+  }
+  // a hanging paper lantern (chōchin)
+  function chochin(x, y){
+    return `<g transform="translate(${x},${y})" stroke="${C.ink}" stroke-width="0.7">`+
+      `<line x1="0" y1="-10" x2="0" y2="-2" stroke="${C.wood2}"/>`+
+      `<ellipse cx="0" cy="4" rx="5.5" ry="7" fill="${C.crimson}"/>`+
+      `<line x1="-5.5" y1="1" x2="5.5" y2="1" stroke="#7c241a"/><line x1="-5.5" y1="7" x2="5.5" y2="7" stroke="#7c241a"/></g>`;
+  }
+
+  // the lodging structures, each drawn at the right, feet on the ground line
+  function building(kind, S){
+    if(kind==="estate"){
+      return `<rect x="176" y="${GY-5}" width="92" height="5" fill="${C.wood}"/>`+
+        `<rect x="184" y="${GY-30}" width="74" height="25" fill="#d9c7a2" stroke="${C.ink}" stroke-width="1"/>`+
+        `<rect x="192" y="${GY-25}" width="20" height="17" fill="#efe6cf" stroke="${C.ink}" stroke-width="0.8"/>`+
+        `<line x1="202" y1="${GY-25}" x2="202" y2="${GY-8}" stroke="${C.ink}" stroke-width="0.5"/><line x1="192" y1="${GY-17}" x2="212" y2="${GY-17}" stroke="${C.ink}" stroke-width="0.5"/>`+
+        `<rect x="228" y="${GY-25}" width="20" height="17" fill="#efe6cf" stroke="${C.ink}" stroke-width="0.8"><animate attributeName="fill" values="#efe6cf;#f4e6bf;#efe6cf" dur="4s" repeatCount="indefinite"/></rect>`+
+        `<line x1="238" y1="${GY-25}" x2="238" y2="${GY-8}" stroke="${C.ink}" stroke-width="0.5"/><line x1="228" y1="${GY-17}" x2="248" y2="${GY-17}" stroke="${C.ink}" stroke-width="0.5"/>`+
+        `<path d="M170 ${GY-30} L221 ${GY-48} L272 ${GY-30} Z" fill="${C.pagodaRoof}" stroke="${C.ink}" stroke-width="1"/>`+
+        `<path d="M170 ${GY-30} L272 ${GY-30} L266 ${GY-26} L176 ${GY-26} Z" fill="#3a333e"/>`+
+        `<path d="M214 ${GY-45} l7 -4 7 4" fill="none" stroke="${C.gold}" stroke-width="1.4"/>`+
+        stoneLantern(150, GY);
+    }
+    if(kind==="temple"){
+      return torii(150, GY, 1.05)+
+        `<rect x="186" y="${GY-24}" width="66" height="19" fill="#c39a6a" stroke="${C.ink}" stroke-width="1"/>`+
+        `<rect x="212" y="${GY-16}" width="14" height="11" fill="${C.tentDoor}"/>`+
+        `<path d="M176 ${GY-24} Q219 ${GY-46} 262 ${GY-24} L254 ${GY-24} Q219 ${GY-40} 184 ${GY-24} Z" fill="#7c3b30" stroke="${C.ink}" stroke-width="1"/>`+
+        `<path d="M176 ${GY-24} Q219 ${GY-46} 262 ${GY-24}" fill="none" stroke="${C.ink}" stroke-width="1"/>`+
+        `<circle cx="219" cy="${GY-30}" r="3.5" fill="none" stroke="${C.gold}" stroke-width="1.1"/>`+
+        stoneLantern(120, GY);
+    }
+    if(kind==="inn"){
+      return `<rect x="184" y="${GY-27}" width="72" height="22" fill="${C.wood}" stroke="${C.ink}" stroke-width="1"/>`+
+        `<path d="M178 ${GY-27} L262 ${GY-27} L255 ${GY-38} L185 ${GY-38} Z" fill="${C.pagodaRoof}" stroke="${C.ink}" stroke-width="1"/>`+
+        `<rect x="206" y="${GY-16}" width="26" height="11" fill="${C.robe}"/>`+
+        `<line x1="214" y1="${GY-16}" x2="214" y2="${GY-5}" stroke="#20304a" stroke-width="0.7"/><line x1="222" y1="${GY-16}" x2="222" y2="${GY-5}" stroke="#20304a" stroke-width="0.7"/>`+
+        `<rect x="212" y="${GY-14}" width="14" height="6" fill="${C.paper}" opacity="0.7"/>`+
+        chochin(192, GY-24);
+    }
+    if(kind==="hut"){
+      return `<path d="M180 ${GY-6} L221 ${GY-40} L262 ${GY-6} Z" fill="#b8a06a" stroke="${C.ink}" stroke-width="1.2"/>`+
+        `<path d="M188 ${GY-6} L221 ${GY-33} L254 ${GY-6} Z" fill="#9c8656"/>`+
+        `<path d="M180 ${GY-6} L221 ${GY-40} L262 ${GY-6}" fill="none" stroke="${C.ink}" stroke-width="0.8"/>`+
+        `<rect x="212" y="${GY-16}" width="14" height="10" fill="${C.tentDoor}"/>`+
+        firePit(160, GY, 0.95);
+    }
+    if(kind==="hideout"){
+      return `<path d="M200 ${GY} q-46 -54 -8 -70 q46 6 46 70 z" fill="#4a4048"/>`+
+        `<path d="M214 ${GY} q-26 -38 -5 -50 q26 4 26 50 z" fill="#0c0d15"/>`+
+        firePit(168, GY, 1.0);
+    }
+    if(kind==="boat"){
+      return `<g transform="translate(214,${GY})"><path d="M-34 0 Q0 16 34 0 L26 10 Q0 16 -26 10 Z" fill="${C.wood2}" stroke="${C.ink}" stroke-width="1"/>`+
+        `<rect x="-1" y="-30" width="2.5" height="30" fill="${C.wood}"/><path d="M2 -28 L20 -8 L2 -8 Z" fill="${C.paper}" opacity="0.85" stroke="${C.ink}" stroke-width="0.6"/></g>`+
+        firePit(150, GY, 0.95);
+    }
+    // warcamp (default): tent + fire
+    return `<path d="M198 ${GY} L224 ${GY-42} L250 ${GY} Z" fill="${C.tent}" stroke="${C.ink}" stroke-width="1.2"/>`+
+      `<path d="M224 ${GY-42} L250 ${GY} L236 ${GY} Z" fill="${C.tentDk}" opacity="0.4"/>`+
+      `<path d="M214 ${GY} L224 ${GY-26} L234 ${GY} Z" fill="${C.tentDoor}"/>`+
+      firePit(150, GY, 1.0);
   }
 
   function caption(text){
@@ -611,11 +719,16 @@ window.SCENE = (function () {
     const weather = weatherOf(S, biome);
     const ctx = { S, inj:injuryLevel(), tool:toolGlyphKey(S), biome, time, weather };
 
-    let s = backdrop(biome, rest?"night":time, weather);
+    let content = backdrop(biome, rest?"night":time, weather);
     let cap;
-    if(st.mode==="camp"){ s += camp(ctx); cap = CAP.camp; }
-    else if(st.mode==="fuji"){ s += MOTIF.setting_out(ctx); cap = CAP.setting_out; }
-    else { const fn = MOTIF[st.tag] || MOTIF.road; s += fn(ctx); cap = CAP[st.tag] || CAP.road; }
+    if(st.mode==="camp"){ content += camp(ctx); cap = CAP.camp; }
+    else if(st.mode==="fuji"){ content += MOTIF.setting_out(ctx); cap = CAP.setting_out; }
+    else { const fn = MOTIF[st.tag] || MOTIF.road; content += fn(ctx); cap = CAP[st.tag] || CAP.road; }
+    // hand-cut linework: a gentle displacement wobble over the whole print
+    let s = `<defs><filter id="woodcut" x="-4%" y="-4%" width="108%" height="108%">`+
+      `<feTurbulence type="fractalNoise" baseFrequency="0.028 0.04" numOctaves="2" seed="7" result="w"/>`+
+      `<feDisplacementMap in="SourceGraphic" in2="w" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`+
+      `<g filter="url(#woodcut)">${content}</g>`;
     s += caption(cap);
     s += frameOverlay();
     el.innerHTML = s;
@@ -720,12 +833,16 @@ window.SCENE = (function () {
     let biome = (bespoke && bespoke.biome) || biomeOf(S);
     let time = (bespoke && bespoke.time) || (end && end.tone==="bad" ? "dusk" : "day");
     let weather = (bespoke && bespoke.weather) || "clear";
-    let s = backdrop(biome, time, weather);
-    if(bespoke){ s += bespoke.svg; }
+    let content = backdrop(biome, time, weather);
+    if(bespoke){ content += bespoke.svg; }
     else {
       const tag = (end && ENDMOTIF[end.id]) || "road";
-      if(tag==="camp") s += camp(ctx); else s += (MOTIF[tag]||MOTIF.road)(ctx);
+      if(tag==="camp") content += camp(ctx); else content += (MOTIF[tag]||MOTIF.road)(ctx);
     }
+    let s = `<defs><filter id="woodcut" x="-4%" y="-4%" width="108%" height="108%">`+
+      `<feTurbulence type="fractalNoise" baseFrequency="0.028 0.04" numOctaves="2" seed="7" result="w"/>`+
+      `<feDisplacementMap in="SourceGraphic" in2="w" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`+
+      `<g filter="url(#woodcut)">${content}</g>`;
     s += frameOverlay();
     return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" `+
       `style="width:100%;height:auto;display:block">${s}</svg>`;
