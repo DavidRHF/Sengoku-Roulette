@@ -156,10 +156,15 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
 .slot.art .tile-svg{width:100%;height:100%;display:block;}
 .slot.art:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(70,52,28,.4);z-index:2;}
 .slot.art:active{transform:translateY(0);}
+/* one shared washi grain across every printed surface */
+.slot.art::after,.detail-art::after,.scene-frame::after,.ending-art::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:1;border-radius:inherit;
+  background-image:var(--grain);background-size:120px 120px;opacity:.09;mix-blend-mode:multiply;}
+.scene-frame::after{inset:9px;}
 
 /* item / companion detail popup */
 .detail-head{display:flex;gap:14px;align-items:center;margin-bottom:4px;}
-.detail-art{width:66px;height:66px;flex:0 0 66px;border-radius:2px;overflow:hidden;border:1.5px solid var(--ink);}
+.detail-art{position:relative;width:66px;height:66px;flex:0 0 66px;border-radius:2px;overflow:hidden;border:1.5px solid var(--ink);}
 .detail-art .tile-svg{width:100%;height:100%;display:block;}
 .detail-name{font-family:'Yuji Syuku',serif;color:var(--ink);margin:0 0 3px;font-size:1.15rem;font-weight:400;}
 .detail-sub{color:var(--vermilion-deep);font-size:.72rem;margin:0;text-transform:uppercase;letter-spacing:.09em;}
