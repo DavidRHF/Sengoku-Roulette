@@ -110,6 +110,16 @@ To add more, just append to the arrays — no engine changes needed.
 - `consume:"Smoke bombs"` — spends one of that item when the option resolves.
 Statuses begin with signature gear via `startItems:[…]` in `core.js`, so *who you are* changes *what you can do*.
 
+**Four ways to begin.** New Game opens a path menu:
+- **Normal Adventure** — the classic wheels decide station, tools, and fate; lasting *conditions* can now find you on the road (a bad fall breaks a leg, a spiked cup poisons you, a shrine blesses or wards you).
+- **Status Scenarios** — pick any station's defining road directly from a list; its status, tools, and quest are set for you and the creation wheels are skipped.
+- **Random Conditions** — spin a wheel of ~12 boons and banes (shielded, blessed, hardy, poisoned, cursed, broken leg…) before creation, and carry it into a normal game.
+- **Randomized Stats** — health (1–50), coin (1–50), and Strength/Wisdom/Charisma (1–20) all start on pure chance.
+
+**Conditions.** A new right-side panel tracks lasting afflictions and boons. They shape the run — draining or mending life after each trial, modifying your effective stats and fortune, or warding off blows — and the bad ones can be cured by herbs, physicians, or temples.
+
+**Station shapes your choices.** Encounters now offer choices that fit who you are: at a barrier gate a noble can *invoke rank*, a warrior *demand passage*, a pilgrim *claim a holy right*, a criminal *slip past*; facing bandits a warrior *cuts them down*, a criminal *speaks their cant*, a peasant *hides with the villagers*. Options can be gated or weighted by your social circles, so the same event plays out differently for a daimyō and a beggar. The **whole roster of stations (and every tool) now appears on the opening wheels**, and the rest scene is drawn as the lodging that station would actually use (estate, temple, inn, hut, hideout, beached boat, or war camp).
+
 **A signature roll for every station.** Each of the 30 stations has exactly **one exclusive encounter only it can ever draw** (`requiresStatus` + `once`) — the outcast's grim bargain, the smith's masterwork, the tea master's warlords' truce, the daimyō's war council, and so on. They can surface anywhere on that character's road and reward moments that fit who they are.
 
 **Coin is a currency stat.** Alongside Strength/Wisdom/Charisma you carry **coin (mon)** — a real economy. Stations start with different purses (a daimyō is flush, a beggar has almost nothing), encounters pay out or cost coin, and coin *matters*: some options are **buy-only** (`needCoin`/`costCoin`) and simply don't appear on the wheel when you can't afford them, a full purse **widens** bribe/purchase slices (`coinBoost`), you can visit markets, hire companions, back trade ventures, take a moneylender's loan, or **buy your way out of jail, ransom, and the press-gang** — and when you're broke, those escapes largely vanish. Coin also gates fate: **the Fortune quest can't end (*A Fortune Made*) unless you've actually amassed the gold**, and a new great ending, **The Merchant Prince**, is reachable only by the very rich.
