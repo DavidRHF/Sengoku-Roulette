@@ -22,24 +22,45 @@
   function boot() {
     STATE.fresh();
 
-    $("btn-new").onclick = () => {
-      UI.sfx.click();
-      UI.modal("Begin anew?", "<p>Abandon the current road and spin a fresh fate?</p>",
-        "Yes, a new road", () => GAME.newGame());
-    };
+    $("btn-new").onclick = () => { UI.sfx.click(); openModeMenu(); };
     $("btn-endings").onclick = () => { UI.sfx.click(); openGallery(); };
     $("btn-how").onclick = () => { UI.sfx.click(); UI.modal("How to Play", HOW_TO, "To the road"); };
 
     if (window.SCENE) SCENE.reset();
 
-    // resume if a save exists, otherwise fresh game
+    // resume if a save exists, otherwise open the mode menu
     if (STATE.hasSave() && STATE.load()) {
       UI.modal("A road awaits", "<p>A saved journey was found. Continue it, or begin anew?</p>",
         "Continue journey", () => GAME.resume());
-      // offer a new-game path via the New button; modal continues the save
     } else {
-      GAME.newGame();
+      openModeMenu();
     }
+  }
+
+  /* ---- new-game mode menu ---------------------------------------------- */
+  function closeModal() { const m = document.getElementById("modal"); if (m) m.classList.remove("show"); }
+  function openModeMenu() {
+    UI.modal("Choose your path", UI.modeMenu(), "Not yet", null, "modal-modes");
+    document.querySelectorAll("#modal-body .mode-btn").forEach(btn => {
+      btn.onclick = () => {
+        UI.sfx.click();
+        const mode = btn.getAttribute("data-mode");
+        if (mode === "scenario") { openScenarioMenu(); return; }
+        closeModal();
+        if (mode === "conditions") GAME.startRandomConditions();
+        else if (mode === "stats") GAME.startRandomStats();
+        else GAME.startNormal();
+      };
+    });
+  }
+  function openScenarioMenu() {
+    const body = document.getElementById("modal-body");
+    if (!body) { GAME.startNormal(); return; }
+    document.getElementById("modal-title").textContent = "Status Scenarios";
+    body.innerHTML = UI.scenarioList();
+    body.querySelectorAll(".scn").forEach(btn => {
+      btn.onclick = () => { UI.sfx.click(); const id = btn.getAttribute("data-scenario"); closeModal(); GAME.startScenario(id); };
+    });
   }
 
   function flash(btn, msg) {
