@@ -47,10 +47,13 @@ DATA.encounters = [
         options:[
           { label:"Present sealed papers", weight:16, valence:"good", needItem:"Travel papers", text:"You lay your sealed travel-papers on the table. The captain reads, straightens, and waves you through with a respectful bow.", consume:null },
           { label:"Show your authority", weight:9, valence:"good", boostItem:"Seal of office", boostAmt:3.2, text:"A glimpse of your seal changes everything. The guards nearly trip bowing you through.", coin:12, flag:"road_news" },
-          { label:"Present papers", weight:8, valence:"good", text:"Your bearing and story satisfy them. They wave you through with a bow.", hp:0 },
+          { label:"Present papers", weight:12, valence:"good", text:"Your bearing and story satisfy them. They wave you through with a bow.", hp:0 },
           { label:"Talk your way through", weight:7, valence:"good", boostItem:"Coin purse", boostAmt:2.2, text:"A joke, a small gift, a flattered captain. The gate opens.", hp:0, item:"Traveler's pass" },
           { label:"Bluster", weight:8, valence:"bad", text:"They dislike your tone. Then someone recognizes your face from the wanted-book, and hands close on your arms.", predicament:"jail" },
-          { label:"Slip around at night", weight:6, valence:"neutral", text:"You take the smuggler's path over the hill. Slower, colder, but unseen.", hp:-3 },
+          { label:"Slip around at night", weight:4, valence:"neutral", boostCircles:{circles:["criminal","low","wanderer"],amt:2.4}, text:"You take the smuggler's path over the hill. Slower, colder, but unseen.", hp:-3 },
+          { label:"Invoke your rank", weight:11, valence:"good", circles:["noble"], text:"You name your house and stare down the captain. He pales, bows, and does not dream of searching your baggage.", coin:8, flag:"road_news" },
+          { label:"Demand passage as a warrior", weight:9, valence:"good", circles:["warrior"], text:"You rest a hand on your hilt and state your business as a fighting man. They decide not to make trouble of it.", hp:0 },
+          { label:"Claim a pilgrim's right", weight:9, valence:"good", circles:["religious"], text:"You show your beads and speak of the temple ahead. Even hard men fear to hinder a pilgrim, and wave you on.", flag:"road_news" },
         ] } } },
 
   { id:"ronin_duel", title:"A Challenge Issued", loc:["road","wild","city","any"], circles:["warrior","criminal","any"], weight:6,
@@ -89,6 +92,8 @@ DATA.encounters = [
         options:[
           { label:"Share your food", weight:9, valence:"good", text:"You feed the child, who then refuses to leave your side — and proves oddly, reliably lucky.", comp:"child" },
           { label:"Give a coin", weight:8, valence:"neutral", text:"You press a coin into small hands and walk on. It is not enough. Nothing is.", hp:0 },
+          { label:"Bless the child, then feed them", weight:9, valence:"good", circles:["religious"], text:"You speak a blessing and share what little you carry. Word spreads that a holy one walks the road with an open hand.", flag:"beloved" },
+          { label:"Earn a meal with a song", weight:8, valence:"good", circles:["entertainer"], text:"You busk a quick crowd, turn coppers into a hot meal, and set the child to eating. A performer feeds two mouths at once.", coin:4, comp:"child" },
           { label:"Wave them off", weight:7, valence:"bad", text:"You brush past. A watching monk marks your hardness aloud, and the shame follows you.", flag:"unkind" },
         ] } } },
 
@@ -98,7 +103,7 @@ DATA.encounters = [
       spin:{ prompt:"You are hurt and trapped. What now?", stat:"wis",
         options:[
           { label:"Search the cleft", weight:9, valence:"good", text:"Feeling along the wall, your hand finds a gap — a passage.", hp:-3, goto:"cave_passage" },
-          { label:"Climb straight up", weight:8, valence:"bad", text:"Halfway up, the rock gives. You fall again, worse.", hp:-10, goto:"cave_passage" },
+          { label:"Climb straight up", weight:8, valence:"bad", text:"Halfway up, the rock gives. You fall again, worse — something in your leg snaps.", hp:-8, condition:"broken_leg", goto:"cave_passage" },
           { label:"Rest, then move", weight:7, valence:"neutral", text:"You bind your bruises and gather your nerve before exploring.", hp:-2, goto:"cave_passage" },
         ] } },
     sub:{
@@ -166,6 +171,8 @@ DATA.encounters = [
         options:[
           { label:"Court his favor", weight:9, valence:"good", text:"Your bearing pleases him. He offers patronage and a token of his house.", item:"Lord's token", flag:"patron" },
           { label:"Offer counsel", weight:7, valence:"good", text:"You give sharp, honest advice on his rivals. He values a straight tongue; a retainer is assigned to you.", comp:"retainer" },
+          { label:"Speak as an equal", weight:9, valence:"good", circles:["noble"], text:"Blood knows blood. You converse as peers, and the lord — flattered to host one of your standing — pledges real friendship.", flag:"patron", item:"Lord's token" },
+          { label:"Bless his house", weight:8, valence:"good", circles:["religious"], text:"You offer a rite for his ancestors and his fortunes. The lord, moved, names your temple a friend of his domain.", flag:"temple_ally" },
           { label:"Overstep", weight:8, valence:"bad", text:"You misjudge the etiquette. He is offended; you are shown out coldly, and watched thereafter.", flag:"marked" },
         ] } } },
 
@@ -185,6 +192,10 @@ DATA.encounters = [
         options:[
           { label:"Lead their defense", weight:9, valence:"good", text:"You drill farmers into a wall of sharpened bamboo. When the bandits come, they break on it. A grateful youth joins you.", hp:-8, comp:"ashigaru", flag:"defender" },
           { label:"Set a clever trap", weight:7, valence:"good", text:"Pits, nets, and nerve win the day with barely a scratch. The village feasts you.", hp:-2, flag:"defender" },
+          { label:"Cut the bandits down", weight:9, valence:"good", circles:["warrior"], text:"This is your trade. When the raiders come you meet them blade to blade, and leave the field theirs no longer.", hp:-5, flag:"defender" },
+          { label:"Speak their own cant", weight:8, valence:"good", circles:["criminal"], text:"You know these men — their signs, their greed. A quiet word turns them toward easier prey, and cuts you a share.", coin:12, flag:"underworld" },
+          { label:"Send for your retainers", weight:8, valence:"good", circles:["noble"], text:"A word from you and armed men answer. The bandits scatter before your colors; the village blesses your house.", flag:"defender" },
+          { label:"Hide with the villagers", weight:7, valence:"neutral", circles:["low","peasant"], text:"You are no hero — you bar the doors and wait it out with the rest. Some are taken; you are not. Survival is its own verdict.", hp:0 },
           { label:"Take their coin and go", weight:7, valence:"neutral", text:"You accept payment for 'scouting the road' and quietly move on. Survival before saints.", hp:0 },
           { label:"Refuse", weight:6, valence:"bad", text:"You will not spend your blood on strangers. Their curses follow you down the road like crows.", flag:"unkind" },
         ] } } },
@@ -195,6 +206,8 @@ DATA.encounters = [
         options:[
           { label:"Shame the collectors", weight:8, valence:"good", text:"You invoke duty and the lord's own honor so sharply the men back down, red-faced.", flag:"defender" },
           { label:"Pay the debt yourself", weight:7, valence:"good", text:"You settle the levy from your own purse. The village will not forget the debt of kindness.", flag:"defender" },
+          { label:"Command them to stop", weight:9, valence:"good", circles:["noble"], text:"You speak with the flat authority of the high-born, and the collectors obey before they think to ask who you are. The farmer keeps his rice.", flag:"defender" },
+          { label:"Buy the levy off", weight:8, valence:"good", circles:["merchant"], needCoin:8, costCoin:8, text:"You settle the debt like any transaction and note it in your ledger. Coin spent, goodwill bought cheap.", flag:"defender" },
           { label:"Fight them off", weight:6, valence:"bad", text:"Steel solves it for a night, but now the lord's law hunts you too.", hp:-6, flag:"hunted" },
           { label:"Look away", weight:8, valence:"neutral", text:"It is not your fight. You walk on. The crying follows farther than you'd like.", hp:0 },
         ] } } },
@@ -251,9 +264,9 @@ DATA.encounters = [
     scene:{ text:"Vermilion paint peeling, a small shrine leans among the roots — abandoned, but the air around it holds its breath.",
       spin:{ prompt:"At the forgotten shrine...", stat:"wis",
         options:[
-          { label:"Clean and pray", weight:9, valence:"good", text:"You sweep the leaves and bow. Something old and grateful settles over you like a warm cloak.", hp:5, flag:"blessed_shrine" },
-          { label:"Leave an offering", weight:8, valence:"good", text:"You leave rice and coin. In the morning, a fine talisman lies where the coin had been.", item:"Kami's talisman", flag:"blessed_shrine" },
-          { label:"Take its offerings", weight:6, valence:"bad", text:"You pocket the old coins. The forest goes silent, then very much not. You leave at a run.", hp:-7, flag:"cursed" },
+          { label:"Clean and pray", weight:9, valence:"good", text:"You sweep the leaves and bow. Something old and grateful settles over you like a warm cloak.", hp:5, flag:"blessed_shrine", condition:"blessed" },
+          { label:"Leave an offering", weight:8, valence:"good", text:"You leave rice and coin. In the morning, a fine talisman lies where the coin had been.", item:"Kami's talisman", flag:"blessed_shrine", condition:"shielded" },
+          { label:"Take its offerings", weight:6, valence:"bad", text:"You pocket the old coins. The forest goes silent, then very much not. You leave at a run — and something clings to you.", hp:-7, flag:"cursed", condition:"cursed" },
         ] } } },
 
   { id:"forest_ninja", title:"Shadows in the Cedars", loc:["forest","mountain"], circles:["warrior","criminal","noble","any"], weight:5,
@@ -416,7 +429,7 @@ DATA.encounters = [
           { label:"Match him cup for cup", weight:10, valence:"good", boostItem:"Sake flask", boostAmt:2.6, text:"Your seasoned liver wins the day and the pot. The beaten ronin laughs and buys the next round himself.", coin:13, item:"Wager winnings", consume:"Sake flask" },
           { label:"Cheat with water", weight:7, valence:"good", text:"You bribe the pourer to water your cups. You 'win' clear-headed, richer, and only a little ashamed.", item:"Wager winnings" },
           { label:"Bow out", weight:7, valence:"neutral", text:"You know your limits. The crowd jeers, briefly, then forgets you.", hp:0 },
-          { label:"Drink to ruin", weight:8, valence:"bad", text:"Pride outlasts sense. You wake in a gutter, purse gone, head splitting.", hp:-7 },
+          { label:"Drink to ruin", weight:8, valence:"bad", text:"One cup tastes wrong a heartbeat too late. You wake in a gutter, purse gone, head splitting — and something bitter in your blood.", hp:-5, condition:"poisoned" },
         ] } } },
 
   { id:"forge_commission", title:"A Blade Worth Making", loc:["city","edo","kyoto","outskirts"], circles:["artisan","warrior","any"], weight:5,
@@ -507,6 +520,7 @@ DATA.encounters = [
           { label:"Talk, then vanish", weight:9, valence:"good", quest:"escape", text:"You spin doubt into the magistrate's certainty long enough to slip the cordon. Whatever you were, you are a runaway now — and freedom is the only quest that matters.", hp:-2 },
           { label:"Break free by force", weight:7, valence:"bad", quest:"escape", text:"You fight clear of their hands and run, but a captain marks your face for the wanted-books.", hp:-8, flag:"hunted" },
           { label:"Bribe the magistrate", weight:6, valence:"good", boostItem:"Coin purse", boostAmt:2.6, quest:"escape", text:"Coin finds the crack in his righteousness. You buy your way loose and a half-day's head start.", consume:"Coin purse" },
+          { label:"Invoke your name and rank", weight:9, valence:"good", circles:["noble"], text:"You draw yourself up and name your house. A magistrate who wanted a nobody finds he has seized someone with powerful friends; he releases you with hasty apologies. No runaway, after all.", flag:"road_news" },
         ] } } },
 
   { id:"meditation_road", title:"Stillness on the Road", loc:["shrine","sacred","mountain","forest","wild"], circles:["religious","any"], weight:6,
@@ -588,7 +602,7 @@ DATA.encounters = [
         options:[
           { label:"Treat the stricken", weight:11, valence:"good", needItem:"Medicine box", consume:"Healing herbs", text:"You boil herbs, break fevers, and burn the foul bedding. In a week the worst has passed, and the village would die for you now.", flag:"beloved", maxhp:3 },
           { label:"Do what little you can", weight:7, valence:"good", boostItem:"Sutra scroll", boostAmt:1.8, text:"No cure, but clean water, kind words, and prayers for the dying. It is not nothing.", flag:"temple_ally" },
-          { label:"Catch the sickness", weight:8, valence:"bad", text:"You breathe what they breathe, and by the next village the fever is in you too.", hp:-12 },
+          { label:"Catch the sickness", weight:8, valence:"bad", text:"You breathe what they breathe, and by the next village the fever is in you too.", hp:-6, condition:"feverish" },
           { label:"Turn away", weight:6, valence:"neutral", text:"You are no healer, and the dead cannot be argued with. You skirt the village and carry the child's stare with you.", hp:0 },
         ] } } },
 
@@ -614,7 +628,7 @@ DATA.encounters = [
     scene:{ text:"A crossroads market, loud with hawkers. A herb-seller, a charm-pedlar, and a fixer selling stamped papers all catch your eye — for the right coin.",
       spin:{ prompt:"Spend your coin?", stat:null,
         options:[
-          { label:"Buy healing herbs (8)", weight:8, valence:"good", needCoin:8, costCoin:8, item:"Healing herbs", hp:6, text:"You buy a wrap of moxa and mountain herbs, and treat your road-hurts on the spot." },
+          { label:"Buy healing herbs (8)", weight:8, valence:"good", needCoin:8, costCoin:8, item:"Healing herbs", hp:6, cureBad:true, text:"You buy a wrap of moxa and mountain herbs, treat your road-hurts, and purge what ails you." },
           { label:"Buy a shrine charm (6)", weight:7, valence:"good", needCoin:6, costCoin:6, item:"Kami's talisman", text:"A blessed ofuda for the road ahead. Cheap insurance against an unlucky wheel." },
           { label:"Buy stamped papers (14)", weight:6, valence:"good", needCoin:14, costCoin:14, item:"Travel papers", text:"The fixer's seal looks real enough. Papers open a great many gates." },
           { label:"Only browse", weight:8, valence:"neutral", text:"You finger the goods, haggle for sport, and buy nothing. Your purse, at least, is untouched.", hp:0 },
