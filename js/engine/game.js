@@ -52,20 +52,79 @@ window.GAME = (function () {
     return s;
   }
 
-  /* ---- 1. NEW GAME ----------------------------------------------------- */
-  function newGame() {
+  /* ---- 1. NEW GAME (modes) --------------------------------------------- */
+  function newGameBase() {
     STATE.fresh();
     document.getElementById("journal").innerHTML = "";
     if (window.SCENE) SCENE.reset();
     UI.renderSheet();
     UI.log("戦国の輪 — Wheel of the Warring States", "header");
+  }
+
+  // (A) Normal adventure — the wheels decide everything, as ever
+  function newGame() { startNormal(); }
+  function startNormal() {
+    newGameBase();
     UI.log("The realm is shattered into warring provinces. Before your road begins, the wheel decides who you are.", "story");
     beginStatusSpin();
   }
 
+  // (D) Randomized stats — created normally, but the gifts are scrambled
+  function startRandomStats() {
+    newGameBase();
+    STATE.get().randomStats = true;
+    UI.log("You cast your lot to the winds — your very gifts will be left to chance.", "story");
+    beginStatusSpin();
+  }
+
+  // (C) Random Conditions — a boon or bane spun before the creation wheels
+  function startRandomConditions() {
+    newGameBase();
+    UI.log("Before the wheel names you, fate presses a gift — or a curse — into your hands.", "story");
+    beginConditionSpin();
+  }
+  function beginConditionSpin() {
+    STATE.get().phase = "condition";
+    const wheel = (DATA.conditionWheel || []).map(id => ({ id, def: DATA.conditions[id] })).filter(x => x.def);
+    const segs = wheel.map(x => ({
+      label: x.def.name, item: x,
+      weight: x.def.kind === "neutral" ? 3 : 4,
+      valence: x.def.kind === "good" ? "good" : x.def.kind === "bad" ? "bad" : "neutral",
+    }));
+    const widx = Math.floor(Math.random() * segs.length);
+    UI.setTitle("The kami weigh your fate…");
+    UI.setSub("A boon or a bane to carry from the very first step — good, ill, or strange.");
+    pendingSpin(segs, widx, (x) => {
+      const d = STATE.applyCondition(x.id);
+      UI.log(`You begin ${d.name}: ${d.desc}`, d.kind === "good" ? "good" : d.kind === "bad" ? "bad" : "story");
+      UI.renderSheet();
+      pendingContinue("Now — who are you? ▸", beginStatusSpin);
+    });
+  }
+
+  // (B) Status scenario — a preset station, tool and quest, wheels skipped
+  function startScenario(id) {
+    const sc = (DATA.scenarios || []).find(s => s.id === id);
+    if (!sc) { startNormal(); return; }
+    newGameBase();
+    const st = DATA.statuses.find(s => s.id === sc.statusId);
+    const tl = DATA.tools.find(t => t.id === sc.toolId);
+    STATE.applyStatus(st);
+    if (tl) STATE.applyTool(tl);
+    const S = STATE.get();
+    S.quest = sc.quest; S.intro = null;
+    UI.log(`Scenario — ${sc.name}.`, "header");
+    UI.log(`${st.name}, ${tl ? tl.name : "bare-handed"}, sworn to the road of ${UI.questLabel(sc.quest)}. ${sc.desc}`, "story");
+    if (S.inventory.length) UI.log(`You carry: ${S.inventory.join(", ")}.`, "gain");
+    S.phase = "journey";
+    UI.renderSheet();
+    if (window.SCENE) SCENE.setMotif("setting_out", S);
+    pendingContinue("Set out ▸", journeyTurn);
+  }
+
   function beginStatusSpin() {
     STATE.get().phase = "status";
-    const { segments, winnerIndex } = RNG.creationSpin(DATA.statuses, 8);
+    const { segments, winnerIndex } = RNG.creationSpin(DATA.statuses, DATA.statuses.length);
     segments.forEach(s => { s.weight = s.item.rarity; });
     UI.setTitle("What is your station in life?");
     UI.setSub("The lowly are common; the mighty, rare — see how the slices differ.");
@@ -82,7 +141,7 @@ window.GAME = (function () {
 
   function beginToolSpin() {
     STATE.get().phase = "tool";
-    const { segments, winnerIndex } = RNG.creationSpin(DATA.tools, 8);
+    const { segments, winnerIndex } = RNG.creationSpin(DATA.tools, DATA.tools.length);
     segments.forEach(s => { s.weight = s.item.rarity; });
     UI.setTitle("What do you carry?");
     UI.setSub("A weapon, a tool, or nothing at all.");
@@ -109,6 +168,11 @@ window.GAME = (function () {
     pendingSpin(segments, winnerIndex, (intro) => {
       S.intro = intro; S.quest = intro.quest;
       UI.log("Your road begins: " + intro.text, "story");
+      if (S.randomStats) {
+        STATE.randomizeStats();
+        const S2 = STATE.get();
+        UI.log(`Fate scrambles your gifts — you set out with ${S2.hp} health, ${S2.coin} mon, ${S2.str} strength, ${S2.wis} wisdom, ${S2.cha} charisma.`, "gain");
+      }
       S.phase = "journey";
       UI.renderSheet();
       if (window.SCENE) SCENE.setMotif("setting_out", S);
@@ -140,6 +204,8 @@ window.GAME = (function () {
   // applies item bias, computes true weights, picks the winner.
   function buildSpin(spin) {
     const S = STATE.get();
+    const myCircles = S.circles || [];
+    const myId = S.status && S.status.id;
     const stat = spin.stat;
     const eff = STATE.effStat(stat);
     const luck = STATE.totalLuck();
@@ -148,6 +214,10 @@ window.GAME = (function () {
       // can't afford it → the option isn't on the wheel at all
       if (o.needCoin && S.coin < o.needCoin) return false;
       if (o.costCoin && S.coin < o.costCoin) return false;
+      // station-appropriate choices: only some stations get some options
+      if (o.circles && !o.circles.some(c => myCircles.includes(c))) return false;
+      if (o.forbidCircles && o.forbidCircles.some(c => myCircles.includes(c))) return false;
+      if (o.requiresStatus && ![].concat(o.requiresStatus).includes(myId)) return false;
       return true;
     });
     if (opts.length < 1) opts = spin.options;
@@ -157,6 +227,8 @@ window.GAME = (function () {
       if (o.dampItem && STATE.hasItem(o.dampItem)) m *= (o.dampAmt || 0.4);
       // a full purse fattens bribes, purchases, and other coin-swayed options
       if (o.coinBoost && S.coin >= o.coinBoost.min) m *= (o.coinBoost.amt || 2.2);
+      // your station makes some choices come more naturally
+      if (o.boostCircles && o.boostCircles.circles.some(c => myCircles.includes(c))) m *= (o.boostCircles.amt || 2.2);
       return m;
     });
     const weights = RNG.optionWeights(opts, stat, eff == null ? 0 : eff, luck, bias);
@@ -269,6 +341,10 @@ window.GAME = (function () {
     S.steps++;
     if (isRest) S.sinceRest = 0; else S.sinceRest++;
 
+    // lasting conditions take their toll (poison drain, regen, wearing-off)
+    const cnotes = STATE.tickConditions();
+    if (cnotes.length) UI.logNotes(cnotes);
+
     UI.renderSheet();
 
     // ending check first (death or achievement)
@@ -380,5 +456,5 @@ window.GAME = (function () {
     }
   }
 
-  return { newGame, resume, showEnding };
+  return { newGame, resume, showEnding, startNormal, startScenario, startRandomConditions, startRandomStats };
 })();

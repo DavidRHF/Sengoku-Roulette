@@ -22,6 +22,8 @@ window.STATE = (function () {
       steps: 0,
       sinceRest: 0,
       usedOnce: {},
+      conditions: [],   // lasting afflictions / boons: {id, charges?, stepsLeft?}
+      randomStats: false,
       log: [],
       ended: null,
       pendingLoc: null,
@@ -76,9 +78,67 @@ window.STATE = (function () {
   }
   function effStat(stat) {
     if (!stat) return null;
-    return clamp((S[stat] || 0) + compMod(stat), 0, 30);
+    return clamp((S[stat] || 0) + compMod(stat) + conditionStat(stat), 0, 30);
   }
-  function totalLuck() { return S.luck + compLuck(); }
+
+  /* ---- conditions: lasting boons & afflictions ------------------------ */
+  function condDef(id) { return (DATA.conditions && DATA.conditions[id]) || null; }
+  function hasCondition(id) { return (S.conditions || []).some(c => c.id === id); }
+  function conditionStat(stat) {
+    let m = 0;
+    for (const c of S.conditions || []) { const d = condDef(c.id); if (d && d.stat && d.stat[stat]) m += d.stat[stat]; }
+    return m;
+  }
+  function conditionLuck() {
+    let m = 0;
+    for (const c of S.conditions || []) { const d = condDef(c.id); if (d && d.luck) m += d.luck; }
+    return m;
+  }
+  function applyCondition(id) {
+    const d = condDef(id);
+    if (!d || hasCondition(id)) return null;
+    const inst = { id };
+    if (d.block) inst.charges = d.block;
+    if (d.duration) inst.stepsLeft = d.duration;
+    S.conditions.push(inst);
+    if (d.instant) {
+      if (d.instant.maxhp) { S.maxhp = clamp(S.maxhp + d.instant.maxhp, 10, 80); S.hp = clamp(S.hp + d.instant.maxhp, 0, S.maxhp); }
+      if (d.instant.hp) S.hp = clamp(S.hp + d.instant.hp, 0, S.maxhp);
+      if (d.instant.coin) S.coin = Math.max(0, S.coin + d.instant.coin);
+    }
+    return d;
+  }
+  function removeCondition(id) {
+    const before = S.conditions.length;
+    S.conditions = S.conditions.filter(c => c.id !== id);
+    return S.conditions.length < before ? condDef(id) : null;
+  }
+  // remove the first "bad" condition (what a cure / physician / temple does)
+  function cureOneBad() {
+    const i = S.conditions.findIndex(c => { const d = condDef(c.id); return d && d.kind === "bad"; });
+    if (i < 0) return null;
+    const id = S.conditions[i].id; S.conditions.splice(i, 1); return id;
+  }
+  // called after every trial: drains, regen, and wearing-off
+  function tickConditions() {
+    const notes = [];
+    for (const c of [...(S.conditions || [])]) {
+      const d = condDef(c.id); if (!d) continue;
+      if (d.perEncounter) {
+        if (d.perEncounter.hp) { S.hp = clamp(S.hp + d.perEncounter.hp, 0, S.maxhp); notes.push({ t: "cond_tick", id: c.id, hp: d.perEncounter.hp }); }
+        if (d.perEncounter.coin) { S.coin = Math.max(0, S.coin + d.perEncounter.coin); notes.push({ t: "cond_tick", id: c.id, coin: d.perEncounter.coin }); }
+      }
+      if (c.stepsLeft) { c.stepsLeft--; if (c.stepsLeft <= 0) { S.conditions = S.conditions.filter(x => x !== c); notes.push({ t: "cond_expire", id: c.id }); } }
+    }
+    return notes;
+  }
+  function randomizeStats() {
+    const r = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+    S.maxhp = r(1, 50); S.hp = S.maxhp;
+    S.coin = r(1, 50);
+    S.str = r(1, 20); S.wis = r(1, 20); S.cha = r(1, 20);
+  }
+  function totalLuck() { return S.luck + compLuck() + conditionLuck(); }
 
   function addCompanion(id, silent) {
     if (!id || S.companions.includes(id) || !DATA.companions[id]) return null;
@@ -103,8 +163,19 @@ window.STATE = (function () {
   function applyEffects(eff) {
     const notes = [];
     if (!eff) return notes;
-    if (eff.hp) { S.hp = clamp(S.hp + eff.hp, 0, S.maxhp);
-      notes.push({ t: eff.hp > 0 ? "heal" : "hurt", v: eff.hp }); }
+    if (eff.hp) {
+      let dmg = eff.hp;
+      if (dmg < 0) {
+        const ward = (S.conditions || []).find(c => c.charges > 0 && condDef(c.id) && condDef(c.id).block);
+        if (ward) {
+          ward.charges--;
+          notes.push({ t: "block", id: ward.id, left: ward.charges });
+          if (ward.charges <= 0) { S.conditions = S.conditions.filter(c => c !== ward); notes.push({ t: "cond_expire", id: ward.id }); }
+          dmg = 0;
+        }
+      }
+      if (dmg) { S.hp = clamp(S.hp + dmg, 0, S.maxhp); notes.push({ t: dmg > 0 ? "heal" : "hurt", v: dmg }); }
+    }
     if (eff.maxhp) { S.maxhp = clamp(S.maxhp + eff.maxhp, 15, 60);
       S.hp = clamp(S.hp + eff.maxhp, 0, S.maxhp);
       notes.push({ t: "maxhp", v: eff.maxhp }); }
@@ -130,6 +201,9 @@ window.STATE = (function () {
     if (eff.loc) S.pendingLoc = eff.loc;
     if (eff.predicament) { S.pendingPredicament = eff.predicament;
       notes.push({ t: "predicament", v: eff.predicament }); }
+    if (eff.condition) { const d = applyCondition(eff.condition); if (d) notes.push({ t: "condition", id: eff.condition, kind: d.kind }); }
+    if (eff.rmCondition) { const d = removeCondition(eff.rmCondition); if (d) notes.push({ t: "rmcondition", id: eff.rmCondition }); }
+    if (eff.cureBad) { const id = cureOneBad(); if (id) notes.push({ t: "rmcondition", id }); }
     if (eff.ending) S.forceEnding = eff.ending;
     return notes;
   }
@@ -229,6 +303,7 @@ window.STATE = (function () {
         hp: S.hp, maxhp: S.maxhp, str: S.str, wis: S.wis, cha: S.cha, luck: S.luck, coin: S.coin,
         circles: S.circles, loc: S.loc, flags: S.flags,
         inventory: S.inventory, companions: S.companions,
+        conditions: S.conditions,
         steps: S.steps, sinceRest: S.sinceRest, usedOnce: S.usedOnce, log: S.log,
         lastEnc: S.lastEnc,
       };
@@ -282,6 +357,7 @@ window.STATE = (function () {
         hp: d.hp, maxhp: d.maxhp, str: d.str, wis: d.wis, cha: d.cha, luck: d.luck, coin: d.coin || 0,
         circles: d.circles || [], loc: d.loc || "outskirts", flags: d.flags || {},
         inventory: d.inventory || [], companions: d.companions || [],
+        conditions: d.conditions || [],
         steps: d.steps || 0, sinceRest: d.sinceRest || 0, usedOnce: d.usedOnce || {},
         log: d.log || [], lastEnc: d.lastEnc || null,
       });
@@ -295,5 +371,6 @@ window.STATE = (function () {
     eligibleEncounters, eligibleRests, eligibleIntros,
     checkEndings, save, load, hasSave, seenEndings, markEndingSeen,
     bestRun, bestRuns, recordRun,
+    applyCondition, removeCondition, hasCondition, tickConditions, randomizeStats,
   };
 })();
