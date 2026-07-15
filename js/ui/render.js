@@ -46,6 +46,16 @@ window.UI = (function () {
       else if (n.t === "rmcomp") { log(`✦ ${n.v} parts from you.`, "loss"); }
       else if (n.t === "quest") { log(`✦ Your destiny turns — you now walk the road of ${questLabel(n.v)}.`, "quest"); sfx.good(); }
       else if (n.t === "predicament") { const m = { jail:"You are seized and thrown in a cell.", ransom:"You are taken captive for ransom.", conscript:"You are pressed into a warlord's levy." }; log(`✦ ${m[n.v] || "Things take a turn for the worse."}`, "loss"); sfx.bad(); }
+      else if (n.t === "condition") { const d = DATA.conditions[n.id] || {}; log(`✦ You are now ${d.name || n.id}. ${d.desc || ""}`, n.kind === "bad" ? "bad" : n.kind === "good" ? "good" : "story"); if (n.kind === "bad") sfx.bad(); else if (n.kind === "good") sfx.good(); }
+      else if (n.t === "rmcondition") { const d = DATA.conditions[n.id] || {}; log(`✦ ${d.name || n.id} lifts from you.`, "gain"); }
+      else if (n.t === "cond_expire") { const d = DATA.conditions[n.id] || {}; log(`✦ ${d.name || n.id} fades.`, "travel"); }
+      else if (n.t === "block") { const d = DATA.conditions[n.id] || {}; log(`✦ Your ${d.name || "ward"} turns aside the blow${n.left > 0 ? ` (${n.left} left)` : ""}.`, "good"); }
+      else if (n.t === "cond_tick") {
+        const d = DATA.conditions[n.id] || {};
+        if (n.hp && n.hp < 0) log(`✦ ${d.name || n.id} drains ${-n.hp} life.`, "loss");
+        else if (n.hp && n.hp > 0) log(`✦ ${d.name || n.id} mends ${n.hp} life.`, "gain");
+        else if (n.coin && n.coin < 0) log(`✦ ${d.name || n.id} costs you ${-n.coin} coin.`, "loss");
+      }
     }
   }
   function rebuildJournal() {
@@ -76,6 +86,7 @@ window.UI = (function () {
     bar("str", S.str, 20);
     bar("wis", S.wis, 20);
     bar("cha", S.cha, 20);
+    renderConditions();
 
     // companions grid
     const cg = $("companions"); cg.innerHTML = "";
@@ -259,9 +270,51 @@ window.UI = (function () {
       `<p class="detail-desc" style="text-align:left">${e.text}</p><hr>` + sheet;
   }
 
+  /* ---- conditions panel ----------------------------------------------- */
+  function renderConditions() {
+    const box = $("conditions"); if (!box) return;
+    const S = STATE.get();
+    const list = S.conditions || [];
+    if (!list.length) { box.innerHTML = `<div class="cond-empty">Hale and unhexed — no conditions.</div>`; return; }
+    box.innerHTML = list.map(c => {
+      const d = DATA.conditions[c.id] || { name: c.id, kind: "neutral", desc: "" };
+      const charge = c.charges ? ` <span class="cond-charge">×${c.charges}</span>` : "";
+      const left = c.stepsLeft ? ` <span class="cond-charge">${c.stepsLeft} left</span>` : "";
+      return `<div class="cond cond-${d.kind}" title="${(d.desc || "").replace(/"/g, "&quot;")}">` +
+        `<span class="cond-dot"></span><span class="cond-name">${d.name}${charge}${left}</span>` +
+        `<span class="cond-desc">${d.desc || ""}</span></div>`;
+    }).join("");
+  }
+
+  /* ---- new-game mode menu + scenario picker --------------------------- */
+  function modeMenu() {
+    const opt = (id, kanji, title, desc) =>
+      `<button class="mode-btn" data-mode="${id}"><span class="mode-seal">${kanji}</span>` +
+      `<span class="mode-text"><span class="mode-title">${title}</span>` +
+      `<span class="mode-desc">${desc}</span></span></button>`;
+    return `<div class="mode-menu">` +
+      opt("normal", "道", "Normal Adventure", "The classic road — the wheels decide your station, tools, and fate. Conditions may still find you along the way.") +
+      opt("scenario", "択", "Status Scenarios", "Choose a station's defining road directly — its status, tools, and quest, no luck required.") +
+      opt("conditions", "運", "Random Conditions", "Spin for a starting boon or bane — shielded, blessed, poisoned, cursed — then play on as normal.") +
+      opt("stats", "乱", "Randomized Stats", "Forget birthright — your health, coin, and stats all start on pure chance.") +
+      `</div>`;
+  }
+  function scenarioList() {
+    const rows = (DATA.scenarios || []).map(s => {
+      const st = DATA.statuses.find(x => x.id === s.statusId);
+      const tl = DATA.tools.find(x => x.id === s.toolId);
+      return `<button class="scn" data-scenario="${s.id}">` +
+        `<span class="scn-title">${s.name}</span>` +
+        `<span class="scn-meta">${st ? st.name : s.statusId} · ${tl ? tl.name : "—"} · ${questLabel(s.quest)}</span>` +
+        `<span class="scn-desc">${s.desc}</span></button>`;
+    }).join("");
+    return `<p class="sm">Pick a life to live. Each fixes a station, its tools, and its quest — the creation wheels are skipped.</p>` +
+      `<div class="scn-list">${rows}</div>`;
+  }
+
   return {
     setTitle, setSub, setAction, hideAction, showAction,
-    log, logNotes, rebuildJournal, renderSheet, modal, sfx, questLabel,
-    endingsGallery, endingDetail, cloudSVG,
+    log, logNotes, rebuildJournal, renderSheet, renderConditions, modal, sfx, questLabel,
+    endingsGallery, endingDetail, cloudSVG, modeMenu, scenarioList,
   };
 })();

@@ -110,24 +110,32 @@ window.WHEEL = (function () {
     svg.appendChild(el("circle", { cx: CX, cy: CY, r: R, fill: "url(#wbBokashi)" }));
     svg.appendChild(el("circle", { cx: CX, cy: CY, r: R, fill: "url(#wbEdge)" }));
 
-    // upright labels (orbit the hub, never tilt)
+    // upright labels for a few wedges; radial (read outward) when there are many
     labelLayer = el("g", { id: "wheel-labels" });
     svg.appendChild(labelLayer);
-    const fontSize = segCount > 6 ? 9 : segCount > 4 ? 10.5 : 12;
+    const radial = segCount > 12;
+    const fontSize = radial ? (segCount > 22 ? 7 : 8)
+      : segCount > 6 ? 9 : segCount > 4 ? 10.5 : 12;
     for (let i = 0; i < segCount; i++) {
       const mid = wedges[i].mid;
-      const cap = wedges[i].frac < 0.09 ? 9 : (segCount > 6 ? 12 : 15);
-      const lines = wrap(segments[i].label, cap);
+      let lines;
+      if (radial) {
+        // strip parenthetical clarifiers and keep to one radial line
+        lines = [String(segments[i].label).replace(/\s*\([^)]*\)\s*/g, "").trim()];
+      } else {
+        const cap = wedges[i].frac < 0.09 ? 9 : (segCount > 6 ? 12 : 15);
+        lines = wrap(segments[i].label, cap);
+      }
       const t = el("text", {
         fill: "#f8f2e4", "font-size": fontSize,
         "font-family": "'Zen Kaku Gothic New', sans-serif", "font-weight": 700,
         "text-anchor": "middle", "dominant-baseline": "middle",
-        style: "paint-order:stroke;stroke:#0a0a12;stroke-width:2.4px;stroke-linejoin:round;",
+        style: "paint-order:stroke;stroke:#2a241b;stroke-width:2.2px;stroke-linejoin:round;",
       });
       const tspans = lines.map(() => el("tspan", {}));
       tspans.forEach((ts, li) => { ts.textContent = lines[li]; t.appendChild(ts); });
       labelLayer.appendChild(t);
-      labels.push({ el: t, tspans, mid, nLines: lines.length, fs: fontSize });
+      labels.push({ el: t, tspans, mid, nLines: lines.length, fs: fontSize, radial });
     }
 
     // hub + ensō (static, drawn on top) — cream disc, sumi-ink brush ring
@@ -142,12 +150,26 @@ window.WHEEL = (function () {
     layoutLabels(0);
   }
 
-  /* place every label horizontally at its orbital position for wheel angle `rot` */
+  /* place every label at its orbital position for wheel angle `rot` */
   function layoutLabels(rot) {
     for (const L of labels) {
-      const [ax, ay] = pt(L.mid + rot, RLABEL);
+      const a = L.mid + rot;
+      if (L.radial) {
+        // sit mid-slice and rotate to read outward; flip on the left half to stay upright
+        const [ax, ay] = pt(a, RLABEL + 4);
+        let deg = ((a % 360) + 360) % 360;
+        const flip = deg > 90 && deg < 270;
+        const rdeg = flip ? deg + 180 : deg;
+        L.el.setAttribute("x", ax);
+        L.el.setAttribute("y", ay);
+        L.el.setAttribute("transform", `rotate(${rdeg} ${ax} ${ay})`);
+        L.tspans.forEach(ts => { ts.setAttribute("x", ax); ts.setAttribute("y", ay); });
+        continue;
+      }
+      const [ax, ay] = pt(a, RLABEL);
       const lh = L.fs + 1.5;
       const y0 = ay - ((L.nLines - 1) / 2) * lh;
+      L.el.removeAttribute("transform");
       L.el.setAttribute("x", ax);
       L.el.setAttribute("y", ay);
       L.tspans.forEach((ts, li) => {

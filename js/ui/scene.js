@@ -542,12 +542,10 @@ window.SCENE = (function () {
     return s;
   }
 
-  // which sort of place would THIS person actually rest at?
+  // which sort of place would THIS person actually rest at? (by station)
   function lodgingType(S){
     const c = (S && S.circles) || [];
     const id = (S && S.status && S.status.id) || "";
-    const q = S && S.quest;
-    if(q==="pilgrimage" || q==="enlighten") return "temple";
     if(c.includes("noble")) return "estate";
     if(c.includes("religious")) return "temple";
     if(c.includes("criminal")) return (biomeOf(S)==="coast" || /pirate/.test(id)) ? "boat" : "hideout";
@@ -726,8 +724,8 @@ window.SCENE = (function () {
     else { const fn = MOTIF[st.tag] || MOTIF.road; content += fn(ctx); cap = CAP[st.tag] || CAP.road; }
     // hand-cut linework: a gentle displacement wobble over the whole print
     let s = `<defs><filter id="woodcut" x="-4%" y="-4%" width="108%" height="108%">`+
-      `<feTurbulence type="fractalNoise" baseFrequency="0.028 0.04" numOctaves="2" seed="7" result="w"/>`+
-      `<feDisplacementMap in="SourceGraphic" in2="w" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`+
+      `<feTurbulence type="fractalNoise" baseFrequency="0.022 0.032" numOctaves="3" seed="7" result="w"/>`+
+      `<feDisplacementMap in="SourceGraphic" in2="w" scale="2.8" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`+
       `<g filter="url(#woodcut)">${content}</g>`;
     s += caption(cap);
     s += frameOverlay();
@@ -840,8 +838,8 @@ window.SCENE = (function () {
       if(tag==="camp") content += camp(ctx); else content += (MOTIF[tag]||MOTIF.road)(ctx);
     }
     let s = `<defs><filter id="woodcut" x="-4%" y="-4%" width="108%" height="108%">`+
-      `<feTurbulence type="fractalNoise" baseFrequency="0.028 0.04" numOctaves="2" seed="7" result="w"/>`+
-      `<feDisplacementMap in="SourceGraphic" in2="w" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`+
+      `<feTurbulence type="fractalNoise" baseFrequency="0.022 0.032" numOctaves="3" seed="7" result="w"/>`+
+      `<feDisplacementMap in="SourceGraphic" in2="w" scale="2.8" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`+
       `<g filter="url(#woodcut)">${content}</g>`;
     s += frameOverlay();
     return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" `+
